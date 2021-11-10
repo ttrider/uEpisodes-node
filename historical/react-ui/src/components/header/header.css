@@ -1,0 +1,49 @@
+/* Main Primary color */
+/* Main Secondary color (1) */
+/* Main Secondary color (2) */
+.header {
+  display: flex;
+  flex-direction: row;
+  height: 3em;
+  background: #022D3C;
+  padding: 0.5em;
+  font-size: 1.2em;
+  color: #fcfcfc;
+  min-height: 3em;
+}
+.hdr-dot {
+  width: 2em;
+  height: 2em;
+}
+.hdr-dot circle {
+  stroke: #f0f0f0;
+  stroke-width: 5px;
+}
+.hdr-dot .red {
+  fill: #900000;
+}
+.hdr-dot .yellow {
+  fill: #8e9000;
+}
+.hdr-dot .green {
+  fill: #00901f;
+}
+.hdr-dot .blue {
+  fill: #006290;
+}
+.hdr-dot .gray {
+  fill: #7a7a7a;
+}
+.hdr-dot .black {
+  fill: #303030;
+}
+.hdr-dot .white {
+  fill: #fdfdfd;
+}
+.hdr-name {
+  font-size: 0.8em;
+  flex-grow: 1;
+}
+.hdr-name div:first-child {
+  font-size: 1.8em;
+}

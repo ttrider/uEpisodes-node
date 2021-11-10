@@ -1,0 +1,14 @@
+/* Main Primary color */
+/* Main Secondary color (1) */
+/* Main Secondary color (2) */
+.workspace {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.workspace .content {
+  flex-grow: 1;
+  display: flex;
+  overflow: auto;
+  padding: 1em;
+}

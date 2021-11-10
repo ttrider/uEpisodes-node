@@ -1,0 +1,15 @@
+{
+  "name": "uepisodes-daemon",
+  "version": "3.0.0",
+  "description": "uEpisodes Daemon",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TTRider Technologies",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^10.12.10",
+    "types": "^0.1.1"
+  }
+}

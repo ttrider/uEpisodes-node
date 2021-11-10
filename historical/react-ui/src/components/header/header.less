@@ -1,0 +1,26 @@
+@import "../../common.less";
+@color-header: @color-secondary-1-4;
+.header {
+    display: flex;
+    flex-direction: row;
+    height: @header-height;
+    background: @color-header;
+    padding: 0.5em;
+    font-size: 1.2em;
+    color: @color-light;
+    min-height: 3em;
+}
+
+.hdr-dot {
+    width: 2em;
+    height: 2em;
+    @statusDot(); 
+}
+
+.hdr-name {
+    font-size: 0.8em;
+    flex-grow: 1;
+    div:first-child {
+        font-size: 1.8em;
+    }
+}

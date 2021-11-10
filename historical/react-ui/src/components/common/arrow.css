@@ -1,0 +1,13 @@
+/* Main Primary color */
+/* Main Secondary color (1) */
+/* Main Secondary color (2) */
+.arrow {
+  cursor: pointer;
+  max-width: 1em;
+  max-height: 1em;
+}
+.arrow path {
+  fill: #104557;
+  stroke: #022D3C;
+  stroke-width: 5px;
+}

@@ -1,0 +1,96 @@
+@import "../common.less";
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: @sidebar-width;
+    background: @color-accent;
+}
+
+.sb-header {
+    color: @color-dim;
+    font-size: 1.8em;
+    margin-top: 0.3em;
+    margin-right: 0.5em;
+    margin-left: 0.5em;
+    padding-bottom: 0.25em;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+    border-bottom: 1px solid @color-light;
+}
+
+.sb-item {
+    display: flex;
+    color: @color-dim;
+    margin-left: 1em;
+    padding: 0.5em;
+    border-radius: 1em 0 0 1em;
+}
+
+.sb-item:hover {
+    background: @color-complement-3;
+    cursor: pointer;
+}
+
+.sb-item-selected {
+    background: @color-light;
+    color: @color-dark; 
+    // border-left: 2px solid white;
+    // border-top: 2px solid white;
+    // border-bottom: 2px solid white;
+    cursor: default;
+}
+
+.sb-item-selected:hover {
+    background: @color-light;
+    cursor: default;
+}
+
+.sb-item-dot {
+    width: 1.5em;
+    height: 1.5em;
+    margin-top: 0.5em;
+    margin-right: 0.5em;
+    @statusDot();
+}
+
+.sb-item-text {
+    font-size: 0.8em;
+    flex-grow: 1;
+    div:first-child {
+        font-size: 1.8em;
+    }
+}
+
+.sb-item-cmd {
+    width: 1.6em;
+    height: 1.6em;
+}
+ 
+.sb-section {
+    color: @color-light;
+    margin-top: 1em;
+}
+
+.sb-section-title {
+    text-transform: uppercase;
+    font-size: 0.7em;
+    margin-left: 1.2em;
+    margin-bottom: 0.5em;
+}
+
+.sb-section-command {
+    display: flex;
+    justify-content: flex-end;
+    button {
+        color: @color-light;
+        font-size: 0.8em;
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+        background: none;
+        border: none;
+    }
+    button:hover {
+        text-decoration: underline;
+        color: @color-light-accent;
+    }
+}

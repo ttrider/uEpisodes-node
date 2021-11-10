@@ -1,0 +1,114 @@
+@import "../../common.less";
+@color-progress: @color-primary-1;
+.torrent-grid {
+    display: grid;
+    grid-template-columns: auto auto 2em 3  em auto 10em auto;
+    align-items: center;
+    border: 1px solid @color-dim;
+    -ms-flex-pack: stretch;
+    justify-content: stretch;
+    -ms-flex-line-pack: start;
+    align-content: start;
+    width: 100%;
+    font-size: 1.2em;
+}
+
+
+.tr-row-even {
+    background: darken(@color-light, 5%);
+}
+
+
+.tr-tor-name {
+    grid-column-start: 1;
+    grid-column-end: 6;
+}
+
+.tr-folder-name {
+    grid-column-start: 1;
+    grid-column-end: 6;
+}
+
+.tr-title {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    svg {
+        min-width: 1em;
+        min-height: 1em;
+        max-width: 1em;
+        max-height: 1em;
+        width: 1em;
+        height: 1em;
+        margin-right: 0.2em;
+        margin-left: 0.2em;
+    }
+    img {
+        min-width: 1.6em;
+        min-height: 1.6em;
+        max-width: 1.6em;
+        max-height: 1.6em;
+        width: 1.6em;
+        height: 1.6em;        
+        margin-right: 0.25em;
+    }
+    div {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+}
+
+.tr-status {
+    grid-column-start: 6;
+    grid-column-end: 6;
+    padding: 0.35em;
+    
+}
+
+.tr-command {
+    grid-column-start: 7;
+    grid-column-end: 7;
+    padding: 0.35em;
+}
+
+
+.tr-file-name {
+    grid-column-start: 1;
+    grid-column-end: span 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+
+
+.tr-show-name {
+    grid-column-start: 2;
+    grid-column-end: span 1;
+    padding: 0.35em;
+    
+}
+
+.tr-show-season {
+    grid-column-start: 3;
+    grid-column-end: span 1;
+    padding: 0.35em;
+    
+}
+
+.tr-show-episode {
+    grid-column-start: 4;
+    grid-column-end: span 1;
+    padding: 0.35em;
+    
+}
+
+.tr-show-title {
+    grid-column-start: 5;
+    grid-column-end: span 2;
+    padding: 0.35em;
+    
+}
