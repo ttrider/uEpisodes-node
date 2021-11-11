@@ -6,18 +6,16 @@ import {
   VuexModule,
 } from "vuex-module-decorators";
 import store from "@/store";
-//import os from "os";
 import path from "path";
 import fs from "fs/promises";
 
 export interface WorksetState {
-  //fileItems: { [name: string]: FileSystemItem };
   fileItems: FileSystemItem[];
 }
 
 @Module({ dynamic: true, store, name: "workset", namespaced: true })
 class Workset extends VuexModule implements WorksetState {
-  //fileItems: { [name: string]: FileSystemItem } = {};
+
   fileItems: FileSystemItem[] = [];
 
   @Mutation addWorkItems(workItems: FileSystemItem[]) {
@@ -44,15 +42,10 @@ function mergeInFileItem(
 ) {
   const lastLevel = newItem.pathParts.length === level + 1;
   const part = newItem.pathParts[level];
-  // if (part === undefined) {
-  //   fileItems.push(newItem);
-  //   return;
-  // }
 
   for (const item of fileItems) {
     if (item.name === part) {
       if (item.id === newItem.id) {
-        // do nothing - it is the same file
         return;
       }
       mergeInFileItem(item.children, newItem, level + 1);
@@ -60,15 +53,6 @@ function mergeInFileItem(
     }
   }
 
-  // const existing = fileItems[part];
-  // if (existing) {
-  //   if (existing.id === newItem.id) {
-  //     // do nothing - it is the same file
-  //     return;
-  //   }
-  //   mergeInFileItem(existing.children, newItem, level + 1);
-  //   return;
-  // }
   // not found
   if (lastLevel) {
     // just add file item
@@ -76,7 +60,7 @@ function mergeInFileItem(
   } else {
     // let's make a folder
     const folder = new FileSystemItem({
-      filePath: newItem.pathParts.slice(0, level + 1).join("/"),
+      filePath: newItem.pathParts.slice(0, level + 1).join(path.sep),
       mode: "folder",
     });
     fileItems.push(folder);
@@ -122,7 +106,6 @@ export class FileSystemItem {
   error?: string;
   size: number;
   mode: "file" | "folder" | "unknown";
-  //children: { [name: string]: FileSystemItem } = {};
   children: FileSystemItem[] = [];
 
   expanded = true;
