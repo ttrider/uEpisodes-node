@@ -1,4 +1,4 @@
-import { getModule, Module, VuexModule } from "vuex-module-decorators";
+import { Action, getModule, Module, VuexModule } from "vuex-module-decorators";
 import store from "@/store";
 
 export interface EpGuidesState {
@@ -18,6 +18,10 @@ class EpGuides extends VuexModule implements EpGuidesState {
   //   const cmap = mapItemSet(items, (item) => new Company(item));
   //   mergeItemSets(this.items, cmap);
   // }
+
+  // @Action()
 }
 
 export const EpGuidesModule = getModule(EpGuides);
+
+

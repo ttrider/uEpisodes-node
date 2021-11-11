@@ -1,0 +1,155 @@
+:root {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 1.3rem;
+
+  --color-light: #fefefe;
+  --background-color: #fefefe;
+  --header-color: #e0e0e0;
+  --header-back: #022d3c;
+  --header-height: 3rem;
+
+  --sidebar-width: 14rem;
+  --sidebar-back: #004618;
+  --sidebar-color: #e0e0e0;
+}
+
+body {
+  margin: 0;
+  position: fixed;
+}
+
+.app {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background: var(--background-color);
+  color: #2c3e50;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  color: var(--header-color);
+  background: var(--header-back);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+
+  .title {
+    padding-left: 0.5rem;
+    font-size: 1.7rem;
+    font-weight: bold;
+  }
+}
+
+.sidebar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  color: var(--sidebar-color);
+  background: var(--sidebar-back);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .sidebar-section {
+    padding-top: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .sidebar-section-header {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.6em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+
+    color: var(--color-light);
+
+    .button {
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+        cursor: pointer;
+      }
+      &:active {
+        color: yellow;
+      }
+    }
+  }
+
+  .sidebar-section-item {
+    font-size: 1.2em;
+    padding-left: 0.2em;
+  }
+}
+
+.view-host {
+  position: fixed;
+  top: var(--header-height);
+  left: var(--sidebar-width);
+  bottom: 0;
+  right: 0;
+  overflow-y: auto;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+
+  padding: 0.35em 0.5em 0.35em 0.5em;
+  border-radius: 1em;
+  border: 1px solid green;
+  background: lightgreen;
+  cursor: pointer;
+  outline: none;
+
+  .b-icon {
+    font-size: 1.5em;
+  }
+
+  &:hover {
+    outline-color: red;
+    outline-offset: 1px;
+    outline-width: 1px;
+  }
+}
+
+.tree-view {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto auto auto;
+  column-gap: 0.5em;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+
+  .ti-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ti-column {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
