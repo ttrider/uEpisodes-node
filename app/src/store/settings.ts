@@ -17,6 +17,10 @@ export interface SettingsState {
 
 export interface SettingsData {
   version: number;
+  detection: {
+    videoExtensions: string;
+    captionExtnsions: string;
+  };
   torrentClient?: {
     url: string;
     user: string;
@@ -30,7 +34,7 @@ export interface SettingsData {
 
 @Module({ dynamic: true, store, name: "settings", namespaced: true })
 class Settings extends VuexModule implements SettingsState {
-  data: SettingsData = { version: -1 };
+  data: SettingsData = getDefaultSettings();
 
   @Mutation settingsFile(settingsFile: SettingsData) {
     this.data = settingsFile;
@@ -43,9 +47,7 @@ class Settings extends VuexModule implements SettingsState {
       ".uepisodes.json"
     );
 
-    let data = {
-      version: 1,
-    };
+    let data = getDefaultSettings();
 
     if (fs.existsSync(settingsPath)) {
       const fb = fs.readFileSync(settingsPath);
@@ -67,9 +69,7 @@ export function initialize() {
     ".uepisodes.json"
   );
 
-  let data = {
-    version: 1,
-  };
+  let data = getDefaultSettings();
 
   if (fs.existsSync(settingsPath)) {
     const fb = fs.readFileSync(settingsPath);
@@ -80,4 +80,16 @@ export function initialize() {
   }
   store.commit("settings/settingsFile", data);
   return data;
+}
+
+function getDefaultSettings() {
+  const defaultSettings: SettingsData = {
+    version: 1,
+    detection: {
+      videoExtensions:
+        ".3g2, .amv, .asf, .avi, .drc, .f4a, .f4b, .f4p, .f4v, .flv, .M2TS, .m2v, .m4p, .m4v, .mkv, .mng, .mov, .mp2, .mp4, .mpe, .mpeg, .mpg, .mpv, .MTS, .mxf, .nsv, .ogg, .ogv, .qt, .rm, .rmvb, .roq, .svi, .viv, .vob, .webm, .wmv, .yuv, ",
+      captionExtnsions: "",
+    },
+  };
+  return defaultSettings;
 }

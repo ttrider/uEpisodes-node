@@ -135,6 +135,23 @@ export class FileSystemItem {
   get id() {
     return this.filePath;
   }
+
+  async initialize(){
+    // classify file
+    //.WEBM
+// .MPG, .MP2, .MPEG, .MPE, .MPV
+// .OGG
+// .MP4, .M4P, .M4V
+// .AVI, .WMV
+// .MOV, .QT
+// .FLV, .SWF
+// AVCHD
+
+    // parse name
+
+    // establish links to closed-caption file (if any)
+
+  }
 }
 
 export interface WorkItem {
