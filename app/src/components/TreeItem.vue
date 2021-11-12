@@ -108,10 +108,16 @@ export default class TreeItem extends Vue {
     }
     const gridColumn = span != 0 ? "1 / span " + span : undefined;
     const paddingLeft = this.level ? this.level * 0.4 : 0;
+    const color =
+      this.mode === "video" || this.mode === "caption"
+        ? "var(--color-dark)"
+        : this.mode !== "folder"
+        ? "var(--color-medium)"
+        : undefined;
     return {
       paddingLeft: paddingLeft + "em",
       minWidth: paddingLeft + 4 + "em",
-
+      color,
       gridColumn,
       cursor: this.mode === "folder" ? "pointer" : undefined,
     };
