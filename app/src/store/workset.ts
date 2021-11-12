@@ -8,6 +8,8 @@ import {
 import store from "@/store";
 import path from "path";
 import fs from "fs/promises";
+import { FileSystemItem } from "@/model/file-item";
+import Vue from "vue";
 
 export interface WorksetState {
   fileItems: FileSystemItem[];
@@ -15,7 +17,6 @@ export interface WorksetState {
 
 @Module({ dynamic: true, store, name: "workset", namespaced: true })
 class Workset extends VuexModule implements WorksetState {
-
   fileItems: FileSystemItem[] = [];
 
   @Mutation addWorkItems(workItems: FileSystemItem[]) {
@@ -56,7 +57,10 @@ function mergeInFileItem(
   // not found
   if (lastLevel) {
     // just add file item
-    fileItems.push(newItem);
+    const newItemObservable = Vue.observable(newItem);
+    fileItems.push(newItemObservable);
+    // begin initialization - don't wait on it
+    newItemObservable.initialize();
   } else {
     // let's make a folder
     const folder = new FileSystemItem({
@@ -78,7 +82,7 @@ async function processIncomingFiles(
     if (fileStat.isFile()) {
       const fi = new FileSystemItem({
         filePath,
-        mode: "file",
+        mode: "other",
         size: fileStat.size,
       });
       workItems.push(fi);
@@ -94,63 +98,10 @@ async function processIncomingFiles(
     workItems.push(
       new FileSystemItem({
         filePath: filePath,
-        mode: "unknown",
+        mode: "other",
         error: (e as Error)?.message ?? "error",
       })
     );
-  }
-}
-
-export class FileSystemItem {
-  filePath: string;
-  error?: string;
-  size: number;
-  mode: "file" | "folder" | "unknown";
-  children: FileSystemItem[] = [];
-
-  expanded = true;
-
-  constructor(params: {
-    filePath: string;
-    mode: "file" | "folder" | "unknown";
-    size?: number;
-    error?: string;
-  }) {
-    this.filePath = params.filePath;
-    this.error = params.error;
-    this.size = params.size ?? 0;
-    this.mode = params.mode;
-  }
-
-  get pathParts() {
-    return this.filePath.split(path.sep);
-  }
-
-  get title() {
-    return this.name ? this.name : "FileSystem";
-  }
-  get name() {
-    return this.pathParts.at(-1) ?? "";
-  }
-  get id() {
-    return this.filePath;
-  }
-
-  async initialize(){
-    // classify file
-    //.WEBM
-// .MPG, .MP2, .MPEG, .MPE, .MPV
-// .OGG
-// .MP4, .M4P, .M4V
-// .AVI, .WMV
-// .MOV, .QT
-// .FLV, .SWF
-// AVCHD
-
-    // parse name
-
-    // establish links to closed-caption file (if any)
-
   }
 }
 
@@ -161,7 +112,7 @@ export interface WorkItem {
 }
 
 export class FileWorkItem implements WorkItem {
-  constructor(public fileItem: FileSystemItem) { }
+  constructor(public fileItem: FileSystemItem) {}
   get id() {
     return this.fileItem.filePath;
   }
@@ -171,7 +122,7 @@ export class FileWorkItem implements WorkItem {
 }
 
 export class FolderWorkItem implements WorkItem {
-  constructor(public fileItem: FileSystemItem) { }
+  constructor(public fileItem: FileSystemItem) {}
   get id() {
     return this.fileItem.filePath;
   }
@@ -183,7 +134,7 @@ export class FolderWorkItem implements WorkItem {
 export class TorrentWorkItem implements WorkItem {
   fileItem: FileSystemItem = new FileSystemItem({
     filePath: "torrent",
-    mode: "unknown",
+    mode: "other",
   });
   get id() {
     return "";

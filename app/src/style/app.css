@@ -124,7 +124,8 @@ body {
 .tree-view .ti-title {
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  align-items: center;
+  display: flex;
 }
 .tree-view .ti-column {
   white-space: nowrap;
