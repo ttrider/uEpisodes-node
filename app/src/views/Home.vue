@@ -3,6 +3,13 @@
     <img alt="Vue logo" src="../assets/logo.png" />
     <u-button icon="foo" title="my title" />
     <div class="tree-view">
+      <div>Path</div>
+      <div>Show Name</div>
+      <div>Season</div>
+      <div>Episode</div>
+      <div>Episode Name</div>
+      <div></div>
+      <div></div>
       <u-tree-item v-for="wi in items" :key="wi.id" :item="wi" :level="0" />
     </div>
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />

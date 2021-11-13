@@ -2,7 +2,7 @@
   <span v-if="item" style="display: contents">
     <div class="ti-title ti-column" :style="titleStyle" @click="titleClick">
       <Icon v-if="mode === 'folder'" tag="div" size="18px">
-        <KeyboardArrowDownOutlined v-if="expended" />
+        <KeyboardArrowDownOutlined v-if="expanded" />
         <KeyboardArrowRightOutlined v-else />
       </Icon>
       <div v-else style="min-width: 18px; width: 18px"></div>
@@ -16,10 +16,10 @@
       </div>
     </div>
     <template v-if="showInfo">
-      <div class="ti-column">show name</div>
-      <div class="ti-column">season number</div>
-      <div class="ti-column">episode number</div>
-      <div class="ti-column">episode name</div>
+      <div class="ti-column">{{ showName }}</div>
+      <div class="ti-column">{{ season }}</div>
+      <div class="ti-column">{{ episode }}</div>
+      <div class="ti-column">{{ episodeName }}</div>
     </template>
     <div class="ti-column" v-if="showProgress">progress</div>
     <div class="ti-column">commands here</div>
@@ -152,6 +152,19 @@ export default class TreeItem extends Vue {
   }
   get title() {
     return this.displayItem.title;
+  }
+
+  get showName() {
+    return this.item.showName ?? "<unknown>";
+  }
+  get season() {
+    return this.item.season ?? "000";
+  }
+  get episode() {
+    return this.item.episode ?? "000";
+  }
+  get episodeName() {
+    return "";
   }
 
   titleClick() {

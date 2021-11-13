@@ -1,12 +1,16 @@
 import path from "path";
 import { FileTypes, SettingsModule } from "@/store/settings";
 import ft from "file-type";
+import match, { EpisodeMetadata } from "@/modules/name-matcher";
 
-export class FileSystemItem {
+export class FileSystemItem implements EpisodeMetadata {
   filePath: string;
   error?: string;
   size: number;
   mode: FileTypes | "folder";
+  showName?: string;
+  season?: number;
+  episode?: number;
   children: FileSystemItem[] = [];
   expanded = true;
 
@@ -56,6 +60,17 @@ export class FileSystemItem {
             this.mode = mime;
             SettingsModule.addFileType({ type: mime, ext: type.ext });
           }
+        }
+
+        const metadata = match(this.pathParts);
+        if (metadata?.showName) {
+          this.showName = metadata?.showName;
+        }
+        if (metadata?.season) {
+          this.season = metadata?.season;
+        }
+        if (metadata?.episode) {
+          this.episode = metadata?.episode;
         }
       }
     }

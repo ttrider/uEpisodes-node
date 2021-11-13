@@ -10,32 +10,14 @@ import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import { remote } from "electron";
+import { getDefaultSettings, SettingsData } from "@/modules/default-settings";
+import _ from "lodash";
 
 export type FileTypes = "video" | "image" | "caption" | "other";
 
 export interface SettingsState {
   data: SettingsData;
 }
-
-export interface SettingsData {
-  version: number;
-  fileTypes: {
-    video?: string;
-    caption?: string;
-    other?: string;
-    image?: string;
-  };
-  torrentClient?: {
-    url: string;
-    user: string;
-    pwd?: string;
-    enabled?: boolean;
-    enableCopy?: boolean;
-    enableMove?: boolean;
-    stopSeeding?: boolean;
-  };
-}
-
 @Module({ dynamic: true, store, name: "settings", namespaced: true })
 class Settings extends VuexModule implements SettingsState {
   data: SettingsData = getDefaultSettings();
@@ -83,7 +65,7 @@ class Settings extends VuexModule implements SettingsState {
       const fb = await fs.readFile(settingsPath);
       if (fb) {
         const fbs = fb.toString();
-        data = JSON.parse(fbs);
+        data = _.merge(data, JSON.parse(fbs));
       }
     }
     store.commit("settings/settingsFile", data);
@@ -130,15 +112,3 @@ function parseFileTypesString(input?: string) {
 }
 
 export const SettingsModule = getModule(Settings, store);
-
-function getDefaultSettings() {
-  const defaultSettings: SettingsData = {
-    version: 1,
-    fileTypes: {
-      video:
-        ".3g2, .amv, .asf, .avi, .drc, .f4a, .f4b, .f4p, .f4v, .flv, .M2TS, .m2v, .m4p, .m4v, .mkv, .mng, .mov, .mp2, .mp4, .mpe, .mpeg, .mpg, .mpv, .MTS, .mxf, .nsv, .ogg, .ogv, .qt, .rm, .rmvb, .roq, .svi, .viv, .vob, .webm, .wmv, .yuv, ",
-      caption: ".srt, .scc, .stl",
-    },
-  };
-  return defaultSettings;
-}
