@@ -102,3 +102,5 @@ dist
 
 # TernJS port file
 .tern-port
+tools/build-test-tree/index.js
+tools/build-test-tree/index.js.map

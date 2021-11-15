@@ -1,0 +1,17 @@
+{
+  "name": "build-test-tree",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^16.11.7",
+    "@types/parse-torrent": "^5.8.4",
+    "parse-torrent": "^9.1.4",
+    "typescript": "^4.4.4"
+  }
+}
