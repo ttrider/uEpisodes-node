@@ -113,7 +113,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { EpGuidesModule } from "@/store/epguides";
+import { EpGuidesModule } from "../store/epguides";
 
 @Component
 export default class HelloWorld extends Vue {

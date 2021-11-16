@@ -48,7 +48,7 @@ import {
 } from "@v2icons/material";
 import { Icon } from "@v2icons/utils";
 import path from "path";
-import { FileSystemItem } from "@/model/file-item";
+import { FileSystemItem } from "../model/file-item";
 
 @Component({
   components: {

@@ -12,14 +12,13 @@
       <div></div>
       <u-tree-item v-for="wi in items" :key="wi.id" :item="wi" :level="0" />
     </div>
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { WorksetModule } from "../store/workset";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+import HelloWorld from "../components/HelloWorld.vue"; // @ is an alias to /src
 
 @Component({
   components: {

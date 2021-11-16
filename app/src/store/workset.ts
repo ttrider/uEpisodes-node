@@ -5,10 +5,10 @@ import {
   Mutation,
   VuexModule,
 } from "vuex-module-decorators";
-import store from "@/store";
+import store from "../store";
 import path from "path";
 import fs from "fs/promises";
-import { FileSystemItem } from "@/model/file-item";
+import { FileSystemItem } from "../model/file-item";
 import Vue from "vue";
 
 export interface WorksetState {

@@ -1,7 +1,7 @@
 import path from "path";
-import { FileTypes, SettingsModule } from "@/store/settings";
+import { FileTypes, SettingsModule } from "../store/settings";
 import ft from "file-type";
-import match, { EpisodeMetadata } from "@/modules/name-matcher";
+import match, { EpisodeMetadata } from "../modules/name-matcher";
 
 export class FileSystemItem implements EpisodeMetadata {
   filePath: string;

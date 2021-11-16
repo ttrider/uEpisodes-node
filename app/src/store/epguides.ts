@@ -1,5 +1,5 @@
 import { Action, getModule, Module, VuexModule } from "vuex-module-decorators";
-import store from "@/store";
+import store from "../store";
 
 export interface EpGuidesState {
   catalog: string;
