@@ -1,10 +1,11 @@
 import { SettingsModule } from "../store/settings";
-import _ from "lodash";
+import _, { forOwnRight } from "lodash";
 
 export interface EpisodeMetadata {
   showName?: string | string[];
   season?: number | number[];
   episode?: number | number[];
+  episodeAlt?: number | number[];
 }
 
 export default function match(fileParts: string[]) {
@@ -13,21 +14,25 @@ export default function match(fileParts: string[]) {
   const titleSet = new Map<string, string>();
   const seasonIndexSet = new Set<number>();
   const episodeIndexSet = new Set<number>();
+  const episodeIndexAltSet = new Set<number>();
 
   const nameParsers = SettingsModule.data.nameParsers;
 
-  for (const fileName of [...fileParts].reverse()) {
+  const nameIndex = fileParts.length - 1;
+  for (let index = nameIndex; index >= 0; index--) {
+    let fileName = (fileParts[index] ?? "").replace(/\./gi, " ");
+    for (const ignorePattern of SettingsModule.data.ignorePatterns) {
+      fileName = fileName.replace(new RegExp(ignorePattern, "gim"), " ");
+    }
+
     if (fileName) {
+      let matched = false;
       for (const pattern of nameParsers) {
         const match = new RegExp(pattern.pattern, "i").exec(fileName);
         if (match) {
           if (pattern.titleIndex != undefined) {
             const showName = match[pattern.titleIndex];
-            const cleanshowName = showName
-              .replace(/[_\-.]+/gm, " ")
-              .replace(/\s{2,}/gm, "")
-              .trim();
-            titleSet.set(cleanshowName.toLowerCase(), cleanshowName);
+            addShowName(showName);
           }
           if (pattern.seasonIndex != undefined) {
             const val = parseInt(match[pattern.seasonIndex]);
@@ -39,17 +44,21 @@ export default function match(fileParts: string[]) {
             const val = parseInt(match[pattern.episodeIndex]);
             if (!isNaN(val)) {
               episodeIndexSet.add(val);
-              ret.episode = val;
             }
           }
           if (pattern.episodeIndexAlt != undefined) {
             const val = parseInt(match[pattern.episodeIndexAlt]);
             if (!isNaN(val)) {
-              episodeIndexSet.add(val);
-              ret.episode = val;
+              episodeIndexAltSet.add(val);
             }
           }
+          matched = true;
           break;
+        }
+      }
+      if (!matched) {
+        if (index != nameIndex) {
+          addShowName(fileName);
         }
       }
     }
@@ -78,5 +87,23 @@ export default function match(fileParts: string[]) {
         : episodeIndexValues;
   }
 
+  if (episodeIndexAltSet.size > 0) {
+    const episodeIndexAltValues = Array.from(episodeIndexAltSet);
+    ret.episodeAlt =
+      episodeIndexAltValues.length === 1
+        ? episodeIndexAltValues[0]
+        : episodeIndexAltValues;
+  }
+
   return ret;
+
+  function addShowName(showName: string) {
+    if (showName) {
+      const cleanshowName = showName
+        .replace(/[_\-.'()]+/gm, " ")
+        .replace(/\s{2,}/gm, " ")
+        .trim();
+      titleSet.set(cleanshowName.toLowerCase(), cleanshowName);
+    }
+  }
 }

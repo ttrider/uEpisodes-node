@@ -31,12 +31,11 @@ describe("simple", () => {
         }
       }
 
-      expect({ ...results, path: fileline.path }).toStrictEqual({
-        showName: fileline.title,
-        season: fileline.season,
-        episode: fileline.episode,
+      expect({
+        ...results,
         path: fileline.path,
-      });
+        name: fileline.name,
+      }).toStrictEqual(fileline);
     }
   });
 });
