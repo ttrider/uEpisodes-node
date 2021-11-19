@@ -21,15 +21,18 @@
       "name": "S1 - E05 - 411 on the DL.avi",
       "path": "Dark Angel/S1 - E05 - 411 on the DL.avi",
       "title": "dark angel",
-      "season": 5,
-      "episode": 11
+      "season": 1,
+      "episode": 5
     },
     {
       "name": "Firefly.S01E01.S01E02.mkv",
       "path": "Firefly/Firefly.S01E01.S01E02.mkv",
       "title": "firefly",
       "season": 1,
-      "episode": 1
+      "episode": [
+        1,
+        2
+      ]
     },
     {
       "name": "MB.1x10.Stinky.Car,.Raccoon.Rocket.DVDRip-admirals.avi",

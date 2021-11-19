@@ -42,6 +42,13 @@ export default function match(fileParts: string[]) {
               ret.episode = val;
             }
           }
+          if (pattern.episodeIndexAlt != undefined) {
+            const val = parseInt(match[pattern.episodeIndexAlt]);
+            if (!isNaN(val)) {
+              episodeIndexSet.add(val);
+              ret.episode = val;
+            }
+          }
           break;
         }
       }

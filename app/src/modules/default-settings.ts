@@ -12,6 +12,7 @@ export interface SettingsData {
     titleIndex?: number;
     seasonIndex?: number;
     episodeIndex?: number;
+    episodeIndexAlt?: number;
     usePath?: boolean;
   }[];
 
@@ -37,40 +38,53 @@ export function getDefaultSettings() {
     nameParsers: [
       {
         pattern:
-          "(.*)(?:[^\\w\\d]|_)+(s(\\d+)(?:[\\s\\.-]*)?e\\s?(\\d+))(\\d\\d)?",
-        titleIndex: 1,
-        seasonIndex: 3,
-        episodeIndex: 4,
+          "^((.*?)(?:[^\\w\\d]|_)+)?(s(\\d+)(?:[\\s.-]*)?e\\s?(\\d+))(-?e?(\\d+))?",
+        titleIndex: 2,
+        seasonIndex: 4,
+        episodeIndex: 5,
+        episodeIndexAlt: 7,
       },
       {
-        pattern: "(.*)(?:[^\\w\\d]|_)+(season\\s+(\\d+)\\s+episode\\s+(\\d+))",
+        pattern:
+          "^((.*?)(?:[^\\w\\d]|_)+)?(season\\s+(\\d+))\\s*((episode\\s+(\\d+))-?(\\d+)?)?",
         titleIndex: 1,
-        seasonIndex: 3,
-        episodeIndex: 4,
+        seasonIndex: 4,
+        episodeIndex: 7,
+        episodeIndexAlt: 8,
       },
       {
-        pattern: "(.*)(?:[^\\w\\d]|_)+((\\d+)x(\\d+))",
-        titleIndex: 1,
-        seasonIndex: 3,
-        episodeIndex: 4,
+        pattern: "^((.*?)(?:[^\\w\\d]|_)+)?((\\d+)x(\\d+))(-?(\\d+))?",
+        titleIndex: 2,
+        seasonIndex: 4,
+        episodeIndex: 5,
+        episodeIndexAlt: 7,
       },
       {
-        pattern: "(.*)(?:[^\\w\\d]|_)+(\\d)(\\d\\d)(?:[^\\w\\d]|_)+(\\d\\d)?",
-        titleIndex: 1,
-        seasonIndex: 2,
+        pattern:
+          "^((.*?)(?:[^\\w\\d]|_)+)?(\\d?\\d)(\\d\\d)(?:[^\\w\\d]|_)+(\\d\\d)?",
+        titleIndex: 2,
+        seasonIndex: 3,
+        episodeIndex: 4,
+        episodeIndexAlt: 5,
+      },
+      {
+        pattern: "^((.*?)(?:[^\\w\\d]|_)+)?s(\\d+)",
+        titleIndex: 2,
+        seasonIndex: 3,
+      },
+      {
+        pattern: "^((.*?)(?:[^\\w\\d]|_)+)?ep?(\\d+)",
+        titleIndex: 2,
         episodeIndex: 3,
       },
       {
-        pattern: "(.*)?\\s+(\\d\\d?)\\.(\\d\\d)(\\d\\d)?",
-        titleIndex: 1,
-        seasonIndex: 2,
+        pattern: "^(ep?(isode)?)?\\s*(\\d+)",
         episodeIndex: 3,
       },
+
       {
-        pattern: "[eE](\\d\\d?)[sS](\\d\\d)",
-        seasonIndex: 2,
-        episodeIndex: 3,
-        usePath: true,
+        pattern: "^(s(eason)?)?[\\s-_]*(\\d+)",
+        seasonIndex: 3,
       },
     ],
   };
