@@ -14,7 +14,9 @@
   "main": "background.js",
   "dependencies": {
     "@electron/remote": "^2.0.1",
+    "axios": "^0.24.0",
     "core-js": "^3.6.5",
+    "csv-string": "^4.0.1",
     "file-type": "^16.5.3",
     "lodash": "^4.17.21",
     "vue": "^2.6.11",
