@@ -2,21 +2,28 @@ import path from "path";
 import { FileTypes, SettingsModule } from "../store/settings";
 import ft from "file-type";
 import { parse } from "../modules/name-parser";
-import { FileMetadata } from "@/modules/types";
+import { ShowEpisodeInfo } from "@/modules/types";
+import getMetadataCandidates from "@/modules/epguides-provider";
 
-export class FileSystemItem implements FileMetadata {
+export class FileSystemItem {
   filePath: string;
+  basePath?: string;
   error?: string;
   size: number;
   mode: FileTypes | "folder";
-  showName?: string[];
-  season?: number[];
-  episode?: number[];
+  showName: string | null = null;
+  episodeName: string | null = null;
+  season: number | null = null;
+  episode: number | null = null;
+  episodeAlt: number | null = null;
+  episodeNameAlt: string | null = null;
+  candidates: ShowEpisodeInfo[] = [];
   children: FileSystemItem[] = [];
   expanded = true;
 
   constructor(params: {
     filePath: string;
+    basePath?: string;
     mode: FileTypes | "folder";
     size?: number;
     error?: string;
@@ -25,6 +32,7 @@ export class FileSystemItem implements FileMetadata {
     this.error = params.error;
     this.size = params.size ?? 0;
     this.mode = params.mode;
+    this.basePath = params.basePath;
   }
 
   get pathParts() {
@@ -42,10 +50,12 @@ export class FileSystemItem implements FileMetadata {
   }
 
   async initialize() {
+    const fileTypes = SettingsModule.fileTypes;
+
     if (!this.error) {
       if (this.mode !== "folder") {
         const ext = path.extname(this.filePath);
-        const mode = SettingsModule.fileTypes[ext];
+        const mode = fileTypes[ext];
         if (mode) {
           this.mode = mode;
         } else {
@@ -63,15 +73,32 @@ export class FileSystemItem implements FileMetadata {
           }
         }
 
-        const metadata = parse(this.pathParts, SettingsModule.data);
-        if (metadata?.showName) {
-          this.showName = metadata?.showName;
-        }
-        if (metadata?.season) {
-          this.season = metadata?.season;
-        }
-        if (metadata?.episode) {
-          this.episode = metadata?.episode;
+        const parts = this.basePath
+          ? path.resolve(this.basePath, this.filePath).split(path.sep)
+          : [this.name];
+
+        const fileMetadata = parse(parts, SettingsModule.data);
+
+        this.candidates = (
+          await getMetadataCandidates(fileMetadata)
+        ).map<ShowEpisodeInfo>((c) => ({
+          showName: c.showMetadata.title,
+          season: c.episodeMetadata.season,
+          episode: c.episodeMetadata.episode,
+          episodeAlt: c.episodeMetadataAlt?.episode,
+          episodeName: c.episodeMetadata.title,
+          episodeNameAlt: c.episodeMetadataAlt?.title,
+          signature: c.signature,
+        }));
+
+        if (this.candidates.length > 0) {
+          const candidate = this.candidates[0];
+          this.showName = candidate.showName;
+          this.season = candidate.season;
+          this.episode = candidate.episode;
+          this.episodeAlt = candidate.episodeAlt ?? null;
+          this.episodeName = candidate.episodeName;
+          this.episodeNameAlt = candidate.episodeNameAlt ?? null;
         }
       }
     }

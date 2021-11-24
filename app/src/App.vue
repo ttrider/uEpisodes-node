@@ -6,7 +6,6 @@
       <u-button title="Add Folder File" icon="settings" @click="openFolder" />
       <u-button title="settings" icon="settings" @click="settings" />
     </header>
-    <sidebar />
     <router-view class="view-host" />
   </div>
 </template>

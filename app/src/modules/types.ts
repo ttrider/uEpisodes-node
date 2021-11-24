@@ -52,3 +52,13 @@ export interface FileMetadata {
   signature?: string;
   showTokens: string[][];
 }
+
+export interface ShowEpisodeInfo {
+  showName: string;
+  season: number;
+  episode: number;
+  episodeAlt?: number;
+  episodeName: string;
+  episodeNameAlt?: string;
+  signature?: string;
+}

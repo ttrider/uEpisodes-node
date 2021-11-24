@@ -93,7 +93,7 @@ body {
 .view-host {
   position: fixed;
   top: var(--header-height);
-  left: var(--sidebar-width);
+  left: 0;
   bottom: 0;
   right: 0;
   overflow-y: auto;

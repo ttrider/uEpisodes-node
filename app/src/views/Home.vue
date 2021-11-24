@@ -1,7 +1,5 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <u-button icon="foo" title="my title" />
     <div class="tree-view">
       <div>Path</div>
       <div>Show Name</div>
@@ -18,12 +16,9 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { WorksetModule } from "../store/workset";
-import HelloWorld from "../components/HelloWorld.vue"; // @ is an alias to /src
 
 @Component({
-  components: {
-    HelloWorld,
-  },
+  components: {},
 })
 export default class Home extends Vue {
   get items() {

@@ -30,7 +30,7 @@ class Workset extends VuexModule implements WorksetState {
   async addFiles(files: string[]) {
     const workItems: FileSystemItem[] = [];
     for (const file of files) {
-      await processIncomingFiles(file, workItems);
+      await processIncomingFiles(file, undefined, workItems);
     }
     return workItems;
   }
@@ -74,6 +74,7 @@ function mergeInFileItem(
 
 async function processIncomingFiles(
   filePath: string,
+  basePath: string | undefined,
   workItems: FileSystemItem[]
 ) {
   try {
@@ -82,16 +83,27 @@ async function processIncomingFiles(
     if (fileStat.isFile()) {
       const fi = new FileSystemItem({
         filePath,
+        basePath,
         mode: "other",
         size: fileStat.size,
       });
       workItems.push(fi);
       return;
     }
+
     if (fileStat.isDirectory()) {
       const files = await fs.readdir(filePath);
+
+      if (!basePath) {
+        basePath = filePath;
+      }
+
       for (const file of files) {
-        await processIncomingFiles(path.resolve(filePath, file), workItems);
+        await processIncomingFiles(
+          path.resolve(filePath, file),
+          basePath,
+          workItems
+        );
       }
     }
   } catch (e) {

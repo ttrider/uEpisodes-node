@@ -17,6 +17,9 @@ export type FileTypes = "video" | "image" | "caption" | "other";
 
 export interface SettingsState {
   data: SettingsData;
+  fileTypes: {
+    [name: string]: FileTypes;
+  };
 }
 @Module({ dynamic: true, store, name: "settings", namespaced: true })
 class Settings extends VuexModule implements SettingsState {

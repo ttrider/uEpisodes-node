@@ -155,7 +155,7 @@ export default class TreeItem extends Vue {
   }
 
   get showName() {
-    return this.item.showName ?? "<unknown>";
+    return this.item.showName ?? "<unk>";
   }
   get season() {
     return this.item.season ?? "000";
@@ -164,7 +164,7 @@ export default class TreeItem extends Vue {
     return this.item.episode ?? "000";
   }
   get episodeName() {
-    return "";
+    return this.item.episodeName ?? "<unk>";
   }
 
   titleClick() {
