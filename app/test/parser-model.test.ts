@@ -2,9 +2,9 @@ import fs from "fs";
 import { parse } from "../src/modules/name-parser";
 import { EpGuidesMetadataProvider } from "../src/modules/epguides-provider";
 
-jest.setTimeout(60000);
+jest.setTimeout(6000000);
 
-describe("simple", () => {
+describe.skip("simple", () => {
   it("name parsers", async () => {
     const testSets = JSON.parse(
       fs.readFileSync("test/test-sets.json").toString()
@@ -23,16 +23,6 @@ describe("simple", () => {
 
     for (const fileline of testSets.files) {
       const results = parse(fileline.path.split("/"));
-
-      if (results.showName) {
-        if (Array.isArray(results.showName)) {
-          results.showName = results.showName.map((t: string) =>
-            t.toLowerCase()
-          );
-        } else {
-          results.showName = results.showName.toLowerCase();
-        }
-      }
 
       expect({
         ...results,
@@ -59,6 +49,57 @@ describe.skip("epguides integration", () => {
 
     expect(metadata).toBeTruthy();
   });
+
+  it.skip("visual validation", async () => {
+    const provider = new EpGuidesMetadataProvider();
+
+    const exactMatch = [];
+    const noMatch = [];
+    const partialMatch = [];
+
+    const testSets = JSON.parse(
+      fs.readFileSync("test/test-sets.json").toString()
+    );
+
+    const total = testSets.files.length;
+    let index = 0;
+    for (const fileline of testSets.files) {
+      console.info(index);
+      try {
+        const results = parse(fileline.path.split("/"));
+
+        const candidates = await provider.detectEpisode(results);
+
+        if (candidates.length > 0) {
+          if (candidates[0].rank === 100) {
+            fileline.candidates = [candidates[0]];
+            exactMatch.push(fileline);
+            console.info(total, index, fileline.path, "exact match");
+          } else {
+            fileline.candidates = candidates;
+            partialMatch.push(fileline);
+            console.info(total, index, fileline.path, "partial macth");
+          }
+        } else {
+          noMatch.push(fileline);
+          console.info(total, index, fileline.path, "no match");
+        }
+      } catch (e) {
+        console.error(total, index, fileline.path, e.message);
+      }
+      index++;
+    }
+
+    fs.writeFileSync(
+      "test/exact-match.json",
+      JSON.stringify(exactMatch, null, 2)
+    );
+    fs.writeFileSync("test/no-match.json", JSON.stringify(noMatch, null, 2));
+    fs.writeFileSync(
+      "test/partial-match.json",
+      JSON.stringify(partialMatch, null, 2)
+    );
+
+    expect(1).toBeTruthy();
+  });
 });
-
-

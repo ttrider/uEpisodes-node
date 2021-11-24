@@ -1,26 +1,32 @@
-import { SettingsModule } from "../store/settings";
+import { getTokens, normalizeName } from "./common";
+import { getDefaultSettings, SettingsData } from "./default-settings";
+import { FileMetadata } from "./types";
 
-export interface FileMetadata {
-  showName?: string | string[];
-  season?: number | number[];
-  episode?: number | number[];
-  episodeAlt?: number | number[];
-}
+export function parse(
+  fileParts: string[] | string,
+  settings: SettingsData = getDefaultSettings()
+) {
+  fileParts = Array.isArray(fileParts) ? fileParts : fileParts.split("/");
 
-export function parse(fileParts: string[]) {
-  const ret: FileMetadata = {};
+  const ret: FileMetadata = {
+    showName: [],
+    season: [],
+    episode: [],
+    episodeAlt: [],
+    showTokens: [],
+  };
 
   const titleSet = new Map<string, string>();
   const seasonIndexSet = new Set<number>();
   const episodeIndexSet = new Set<number>();
   const episodeIndexAltSet = new Set<number>();
 
-  const nameParsers = SettingsModule.data.nameParsers;
+  const nameParsers = settings.nameParsers;
 
   const nameIndex = fileParts.length - 1;
   for (let index = nameIndex; index >= 0; index--) {
     let fileName = (fileParts[index] ?? "").replace(/\./gi, " ");
-    for (const ignorePattern of SettingsModule.data.ignorePatterns) {
+    for (const ignorePattern of settings.ignorePatterns) {
       fileName = fileName.replace(new RegExp(ignorePattern, "gim"), " ");
     }
 
@@ -64,45 +70,31 @@ export function parse(fileParts: string[]) {
   }
 
   if (titleSet.size > 0) {
-    const titleKeys = Array.from(titleSet.keys());
-    if (titleKeys.length === 1) {
-      ret.showName = titleSet.get(titleKeys[0]);
-    } else {
-      ret.showName = Array.from(titleSet.values()).sort((a, b) =>
-        a.length > b.length ? -1 : 1
-      );
-    }
+    ret.showName = Array.from(titleSet.values()).sort((a, b) =>
+      a.length > b.length ? -1 : 1
+    );
   }
   if (seasonIndexSet.size > 0) {
-    const seasonIndexValues = Array.from(seasonIndexSet);
-    ret.season =
-      seasonIndexValues.length === 1 ? seasonIndexValues[0] : seasonIndexValues;
+    ret.season = Array.from(seasonIndexSet);
   }
   if (episodeIndexSet.size > 0) {
-    const episodeIndexValues = Array.from(episodeIndexSet);
-    ret.episode =
-      episodeIndexValues.length === 1
-        ? episodeIndexValues[0]
-        : episodeIndexValues;
+    ret.episode = Array.from(episodeIndexSet);
   }
 
   if (episodeIndexAltSet.size > 0) {
-    const episodeIndexAltValues = Array.from(episodeIndexAltSet);
-    ret.episodeAlt =
-      episodeIndexAltValues.length === 1
-        ? episodeIndexAltValues[0]
-        : episodeIndexAltValues;
+    ret.episodeAlt = Array.from(episodeIndexAltSet);
   }
+
+  ret.signature = ret.showName.join("-").toLowerCase().replace(/\s/gim, "-");
+
+  ret.showTokens = ret.showName.map((t) => getTokens(t));
 
   return ret;
 
   function addShowName(showName: string) {
     if (showName) {
-      const cleanshowName = showName
-        .replace(/[_\-.'()]+/gm, " ")
-        .replace(/\s{2,}/gm, " ")
-        .trim();
-      titleSet.set(cleanshowName.toLowerCase(), cleanshowName);
+      const cleanshowName = normalizeName(showName);
+      titleSet.set(cleanshowName, cleanshowName);
     }
   }
 }

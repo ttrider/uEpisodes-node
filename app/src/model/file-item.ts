@@ -1,16 +1,17 @@
 import path from "path";
 import { FileTypes, SettingsModule } from "../store/settings";
 import ft from "file-type";
-import { parse, FileMetadata } from "../modules/name-parser";
+import { parse } from "../modules/name-parser";
+import { FileMetadata } from "@/modules/types";
 
 export class FileSystemItem implements FileMetadata {
   filePath: string;
   error?: string;
   size: number;
   mode: FileTypes | "folder";
-  showName?: string | string[];
-  season?: number | number[];
-  episode?: number | number[];
+  showName?: string[];
+  season?: number[];
+  episode?: number[];
   children: FileSystemItem[] = [];
   expanded = true;
 
@@ -62,7 +63,7 @@ export class FileSystemItem implements FileMetadata {
           }
         }
 
-        const metadata = parse(this.pathParts);
+        const metadata = parse(this.pathParts, SettingsModule.data);
         if (metadata?.showName) {
           this.showName = metadata?.showName;
         }

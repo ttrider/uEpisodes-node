@@ -1,6 +1,23 @@
 {
   "files": [
     {
+      "name": "under.the.dome.30102.hdtv-lol.mp4",
+      "path": "Under.the.Dome.S03E01E02.HDTV.x264-LOL[ettv]/under.the.dome.30102.hdtv-lol.mp4",
+      "showName": [
+        "under the dome 3",
+        "under the dome"
+      ],
+      "season": [
+        1,
+        3
+      ],
+      "episode": [
+        2,
+        1
+      ],
+      "episodeAlt": 2
+    },
+    {
       "name": "Firefly.S01E01.S01E02.mkv",
       "path": "Firefly/Firefly.S01E01.S01E02.mkv",
       "showName": "firefly",
@@ -2601,23 +2618,6 @@
       "showName": "almost human",
       "season": 1,
       "episode": 11
-    },
-    {
-      "name": "under.the.dome.30102.hdtv-lol.mp4",
-      "path": "Under.the.Dome.S03E01E02.HDTV.x264-LOL[ettv]/under.the.dome.30102.hdtv-lol.mp4",
-      "showName": [
-        "under the dome 3",
-        "under the dome"
-      ],
-      "season": [
-        1,
-        3
-      ],
-      "episode": [
-        2,
-        1
-      ],
-      "episodeAlt": 2
     }
   ]
 }

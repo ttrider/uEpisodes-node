@@ -18,6 +18,10 @@ export interface SettingsData {
     usePath?: boolean;
   }[];
 
+  knownSignatures: {
+    [signature: string]: string;
+  };
+
   torrentClient?: {
     url: string;
     user: string;
@@ -42,6 +46,9 @@ export function getDefaultSettings() {
       "\\[\\swww\\storrentday\\scom\\s\\]",
       "\\[\\swww\\sCpasBien\\sio\\s\\]",
     ],
+    knownSignatures: {
+      "under-dome-3-under-dome": "1",
+    },
     nameParsers: [
       {
         pattern:

@@ -1,0 +1,24 @@
+{
+  "name": "uepisodes-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/log4js": "^2.3.5",
+    "@types/lru-cache": "^5.1.1",
+    "axios": "^0.24.0",
+    "csv-string": "^4.0.1",
+    "file-type": "^16.5.3",
+    "lodash": "^4.17.21",
+    "log4js": "^6.3.0",
+    "lru-cache": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.176"
+  }
+}
