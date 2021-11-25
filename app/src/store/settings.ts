@@ -10,8 +10,8 @@ import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import { remote } from "electron";
-import { getDefaultSettings, SettingsData } from "../modules/default-settings";
 import _ from "lodash";
+import { getDefaultSettings, SettingsData } from "uepisodes-modules";
 
 export type FileTypes = "video" | "image" | "caption" | "other";
 

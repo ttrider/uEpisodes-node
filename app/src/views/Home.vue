@@ -2,10 +2,10 @@
   <div class="home">
     <div class="tree-view">
       <div>Path</div>
-      <div>Show Name</div>
-      <div>Season</div>
-      <div>Episode</div>
-      <div>Episode Name</div>
+      <div>Show</div>
+      <div>S#</div>
+      <div>E#</div>
+      <div>Name</div>
       <div></div>
       <div></div>
       <u-tree-item v-for="wi in items" :key="wi.id" :item="wi" :level="0" />

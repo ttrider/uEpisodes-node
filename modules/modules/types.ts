@@ -62,3 +62,12 @@ export interface ShowEpisodeInfo {
   episodeNameAlt?: string;
   signature?: string;
 }
+
+export interface HttpClient {
+  get(url: string): Promise<{
+    data: any;
+    lastModified: Date;
+  } | undefined>;
+
+  head(url: string, lastUpdated?: Date | undefined): Promise<boolean | undefined>;
+}

@@ -2,7 +2,7 @@ import { getTokens, normalizeName } from "./common";
 import { getDefaultSettings, SettingsData } from "./default-settings";
 import { FileMetadata } from "./types";
 
-export function parse(
+export function filePathParser(
   fileParts: string[] | string,
   settings: SettingsData = getDefaultSettings()
 ) {

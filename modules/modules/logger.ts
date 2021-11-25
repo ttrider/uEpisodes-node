@@ -1,8 +1,10 @@
 import log4js from "log4js";
+import os from "os";
+import path from "path";
 log4js.configure({
   appenders: {
-    uepisodes: { type: "file", filename: "uepisodes.log" },
-    output: { type: "file", filename: "output.log" },
+    uepisodes: { type: "file", filename: path.resolve(os.tmpdir(), "uepisodes", "uepisodes.log") },
+    output: { type: "file", filename: path.resolve(os.tmpdir(), "uepisodes", "output.log") },
     err: { type: "stdout" },
     console: { type: "console" },
   },
@@ -18,7 +20,7 @@ log4js.configure({
   },
 });
 
-export default function getLogger(
+export function getLogger(
   category?: string,
   level?: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "off"
 ) {

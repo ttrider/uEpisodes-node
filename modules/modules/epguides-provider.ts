@@ -10,15 +10,17 @@ import {
 import { getTokens, parseCSV, parseDate, parseNumber } from "./common";
 
 import getMetadata from "./data-client";
-const allShowsUrl = "https://epguides.com/common/allshows.txt";
-const tvMazeShowUrl = "https://epguides.com/common/exportToCSVmaze.asp?maze=";
+import { HttpClient } from "..";
+const allShowsUrl = "http://epguides.com/common/allshows.txt";
+const tvMazeShowUrl = "http://epguides.com/common/exportToCSVmaze.asp?maze=";
 
-function getShows() {
-  return getMetadata(allShowsUrl, processShowList, undefined, false);
+function getShows(httpClient: HttpClient) {
+  return getMetadata(httpClient, allShowsUrl, processShowList, undefined, false);
 }
 
-function getShowById(id: string) {
+function getShowById(httpClient: HttpClient, id: string) {
   return getMetadata(
+    httpClient,
     tvMazeShowUrl + id,
     processEpisodeList,
     /<pre>(.*?)<\/pre>/gs,
@@ -26,7 +28,8 @@ function getShowById(id: string) {
   );
 }
 
-export default async function getMetadataCandidates(
+export async function getMetadataCandidates(
+  httpClient: HttpClient,
   fileMetadata: FileMetadata,
   settings: SettingsData = getDefaultSettings()
 ) {
@@ -38,7 +41,7 @@ export default async function getMetadataCandidates(
     signature?: string;
   }[] = [];
 
-  const allShows = await getShows();
+  const allShows = await getShows(httpClient);
 
   const { showTokens, season, episode, episodeAlt } = fileMetadata;
 
@@ -48,7 +51,7 @@ export default async function getMetadataCandidates(
   if (knownShowId) {
     const showMetadata = allShows[knownShowId];
     if (showMetadata) {
-      const showEpisodes = await getShowById(knownShowId);
+      const showEpisodes = await getShowById(httpClient, knownShowId);
       if (showEpisodes) {
         ret.push(...getShowMetadata(showMetadata, showEpisodes, 50));
         return ret;
@@ -58,7 +61,7 @@ export default async function getMetadataCandidates(
 
   const showCandidates = getCandidates(allShows, showTokens);
   for (const showCandidate of showCandidates) {
-    const showEpisodes = await getShowById(showCandidate.showMetadata.id);
+    const showEpisodes = await getShowById(httpClient, showCandidate.showMetadata.id);
     if (showEpisodes) {
       ret.push(
         ...getShowMetadata(

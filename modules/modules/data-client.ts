@@ -2,14 +2,16 @@ import path from "path";
 import os from "os";
 import { stat, mkdir, writeFile, readFile, utimes } from "fs/promises";
 import axios, { AxiosResponse } from "axios";
-import getLogger from "./logger";
+import { getLogger } from "./logger";
 import { maxAge, parseDate } from "./common";
 import lru from "lru-cache";
+import { HttpClient } from "..";
 
 const lruOptions = { maxAge: maxAge };
 const metadataLRU = new lru(lruOptions);
 
 export default async function getMetadata<T>(
+  httpClient: HttpClient,
   fileUrl: string,
   factory: (body: string) => Promise<T>,
   filter?: RegExp,
@@ -45,10 +47,10 @@ export default async function getMetadata<T>(
     modifiedTime = undefined;
   }
 
-  const shouldDownload = await head(fileUrl, modifiedTime);
+  const shouldDownload = await httpClient.head(fileUrl, modifiedTime);
   logger.debug("shouldDownload:", shouldDownload);
   if (shouldDownload) {
-    const dataString = await get(fileUrl);
+    const dataString = await httpClient.get(fileUrl);
     logger.debug(
       "got results from ",
       fileUrl,
@@ -117,51 +119,4 @@ async function getModifiedTime(path: string) {
   }
 }
 
-async function head(url: string, lastUpdated?: Date) {
-  if (lastUpdated === undefined) return true;
 
-  try {
-    const response = await axios.head(url, {
-      headers: {
-        "if-modified-since": lastUpdated.toUTCString(),
-      },
-    });
-
-    if (response.status) {
-      if (response.status === 304) {
-        return false;
-      }
-      if (response.status < 400) {
-        return true;
-      }
-    }
-  } catch (e) {
-    const response = (
-      e as unknown as { response?: AxiosResponse<unknown, unknown> }
-    ).response;
-    if (response) {
-      if (response.status) {
-        if (response.status === 304) {
-          return false;
-        }
-        if (response.status < 400) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-}
-
-async function get(url: string) {
-  const response = await axios.get(url);
-
-  if (response?.status == 200) {
-    return {
-      data: response.data,
-      lastModified: parseDate(response.headers["last-modified"]) ?? new Date(),
-    };
-  }
-  console.error(response.statusText);
-  return;
-}

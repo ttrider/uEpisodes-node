@@ -1,18 +1,68 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, net } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
+import path from "path";
 const isDevelopment = process.env.NODE_ENV !== "production";
+import {
+  filePathParser,
+  getDefaultSettings,
+  getMetadataCandidates,
+  SettingsData,
+  ShowEpisodeInfo,
+} from "uepisodes-modules";
+import { client } from "./electron/http-client";
+import { provideMetadata } from "./electron/metadata-provider";
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
 
+declare const __static: string;
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
 ]);
+
+ipcMain.handle(
+  "provide-metadata",
+  (e, arg: { basePath: string; filePath: string }) => {
+    return provideMetadata(arg);
+  }
+);
+
+// ipcMain.on(
+//   "get-metadata-candidates",
+//   (event, arg: { basePath: string; filePath: string }) => {
+//     console.log(arg);
+
+//     const parts = arg.basePath
+//       ? path.resolve(arg.basePath, arg.filePath).split(path.sep)
+//       : [path.basename(arg.filePath)];
+
+//     const fileMetadata = filePathParser(parts);
+
+//     getMetadataCandidates(fileMetadata).then((res) => {
+//       const candidates = res.map<ShowEpisodeInfo>((c) => ({
+//         showName: c.showMetadata.title,
+//         season: c.episodeMetadata.season,
+//         episode: c.episodeMetadata.episode,
+//         episodeAlt: c.episodeMetadataAlt
+//           ? c.episodeMetadataAlt.episode
+//           : undefined,
+//         episodeName: c.episodeMetadata.title,
+//         episodeNameAlt: c.episodeMetadataAlt
+//           ? c.episodeMetadataAlt.title
+//           : undefined,
+//         signature: c.signature,
+//       }));
+
+//       event.reply("get-metadata-candidates-reply", candidates);
+//     });
+//   }
+// );
 
 async function createWindow() {
   // Create the browser window.
@@ -25,7 +75,10 @@ async function createWindow() {
       nodeIntegration: process.env
         .ELECTRON_NODE_INTEGRATION as unknown as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+      //contextIsolation: true,
       enableRemoteModule: true,
+      // __static is set by webpack and will point to the public directory
+      preload: path.resolve(__static, "preload.js"),
     },
   });
 
@@ -69,6 +122,20 @@ app.on("ready", async () => {
   }
   createWindow();
 });
+
+app.on(
+  "certificate-error",
+  (event, webContents, url, error, certificate, callback) => {
+    console.warn("certificate-error");
+    // if (url === "https://github.com") {
+    // Verification logic.
+    event.preventDefault();
+    callback(true);
+    // } else {
+    //   callback(false);
+    // }
+  }
+);
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

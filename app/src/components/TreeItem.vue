@@ -21,8 +21,8 @@
       <div class="ti-column">{{ episode }}</div>
       <div class="ti-column">{{ episodeName }}</div>
     </template>
-    <div class="ti-column" v-if="showProgress">progress</div>
-    <div class="ti-column">commands here</div>
+    <div class="ti-column" v-if="showProgress">{{ status }}</div>
+    <div class="ti-column">CMD</div>
     <template v-if="expanded">
       <u-tree-item
         v-for="fi in children"
@@ -155,16 +155,20 @@ export default class TreeItem extends Vue {
   }
 
   get showName() {
-    return this.item.showName ?? "<unk>";
+    return this.item.showName ?? "";
   }
   get season() {
-    return this.item.season ?? "000";
+    return this.item.season ?? "";
   }
   get episode() {
-    return this.item.episode ?? "000";
+    return this.item.episode ?? "";
   }
   get episodeName() {
-    return this.item.episodeName ?? "<unk>";
+    return this.item.episodeName ?? "";
+  }
+
+  get status() {
+    return this.item.status ?? "";
   }
 
   titleClick() {

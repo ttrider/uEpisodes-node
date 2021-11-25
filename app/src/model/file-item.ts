@@ -1,9 +1,17 @@
 import path from "path";
 import { FileTypes, SettingsModule } from "../store/settings";
 import ft from "file-type";
-import { parse } from "../modules/name-parser";
-import { ShowEpisodeInfo } from "@/modules/types";
-import getMetadataCandidates from "@/modules/epguides-provider";
+import {
+  filePathParser,
+  getMetadataCandidates,
+  ShowEpisodeInfo,
+} from "uepisodes-modules";
+import { client } from "@/electron/http-client";
+
+const provideMetadata: (params: {
+  basePath: string;
+  filePath: string;
+}) => Promise<ShowEpisodeInfo[]> = (window as any).provideMetadata;
 
 export class FileSystemItem {
   filePath: string;
@@ -19,6 +27,7 @@ export class FileSystemItem {
   episodeNameAlt: string | null = null;
   candidates: ShowEpisodeInfo[] = [];
   children: FileSystemItem[] = [];
+  status = "";
   expanded = true;
 
   constructor(params: {
@@ -50,6 +59,7 @@ export class FileSystemItem {
   }
 
   async initialize() {
+    this.status = "loading...";
     const fileTypes = SettingsModule.fileTypes;
 
     if (!this.error) {
@@ -73,23 +83,28 @@ export class FileSystemItem {
           }
         }
 
-        const parts = this.basePath
-          ? path.resolve(this.basePath, this.filePath).split(path.sep)
-          : [this.name];
+        this.candidates = await provideMetadata({
+          basePath: this.basePath ?? "",
+          filePath: this.filePath,
+        });
 
-        const fileMetadata = parse(parts, SettingsModule.data);
+        // const parts = this.basePath
+        //   ? path.resolve(this.basePath, this.filePath).split(path.sep)
+        //   : [this.name];
 
-        this.candidates = (
-          await getMetadataCandidates(fileMetadata)
-        ).map<ShowEpisodeInfo>((c) => ({
-          showName: c.showMetadata.title,
-          season: c.episodeMetadata.season,
-          episode: c.episodeMetadata.episode,
-          episodeAlt: c.episodeMetadataAlt?.episode,
-          episodeName: c.episodeMetadata.title,
-          episodeNameAlt: c.episodeMetadataAlt?.title,
-          signature: c.signature,
-        }));
+        // const fileMetadata = filePathParser(parts, SettingsModule.data);
+
+        // this.candidates = (
+        //   await getMetadataCandidates(client, fileMetadata)
+        // ).map<ShowEpisodeInfo>((c) => ({
+        //   showName: c.showMetadata.title,
+        //   season: c.episodeMetadata.season,
+        //   episode: c.episodeMetadata.episode,
+        //   episodeAlt: c.episodeMetadataAlt?.episode,
+        //   episodeName: c.episodeMetadata.title,
+        //   episodeNameAlt: c.episodeMetadataAlt?.title,
+        //   signature: c.signature,
+        // }));
 
         if (this.candidates.length > 0) {
           const candidate = this.candidates[0];
@@ -100,6 +115,7 @@ export class FileSystemItem {
           this.episodeName = candidate.episodeName;
           this.episodeNameAlt = candidate.episodeNameAlt ?? null;
         }
+        this.status = "";
       }
     }
   }
