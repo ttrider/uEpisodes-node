@@ -5,18 +5,23 @@ import path from "path";
 async function run() {
   console.info("parse torrent files");
 
-  const root = "/Users/vladimiryangurskiy/src/uEpisodes/tools/Torrents";
-  const outroot = path.resolve("./", "tree");
+  const root = "/Volumes/exmusic/test-set/Torrents";
+  const outroot = path.resolve("/Volumes/exmusic/test-set", "tree");
   const files = await fs.readdir(root);
-  for (const fl of files) {
-    const filePath = path.resolve(root, fl);
+  for (let index = 0; index < files.length; index++) {
+    let fl = files[index];
+    if (fl.startsWith("._")){
+      fl = fl.substr(2);
+    }
+    let filePath = path.resolve(root, fl);
+   
 
     const ext = path.extname(filePath);
     if (ext != ".torrent") {
-      console.info(filePath, "skipped");
+      console.info(`${index}/${files.length}`,filePath, "skipped");
       continue;
     }
-    console.info(filePath);
+    console.info(`${index}/${files.length}`,filePath);
 
     const tfile = (await fs.readFile(filePath));
     try {
@@ -26,8 +31,8 @@ async function run() {
           const fullPath = path.resolve(outroot, file.path);
           const dirPath = path.dirname(fullPath);
           const length = file.length;
-          fs.mkdir(dirPath, {recursive:true}).catch(e=>{});
-          console.info(" - ", fullPath);
+          await fs.mkdir(dirPath, {recursive:true}).catch(e=>{});
+          console.warn(""," - ", fullPath);
           await fs.writeFile(fullPath, length.toString());
         }
       }
