@@ -160,3 +160,40 @@ body {
     text-overflow: ellipsis;
   }
 }
+
+.command-button {
+  padding: 0;
+  border: none;
+  font-size: inherit;
+  align-items: center;
+  background: none;
+  cursor: pointer;
+  position: relative;
+
+  &:hover {
+    color: brown;
+    svg {
+      position: relative;
+      top: -1px;
+      left: -1px;
+    }
+  }
+  &:active {
+    color: brown;
+    svg {
+      position: relative;
+      top: 0;
+      left: 0;
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    color: brown;
+    svg {
+      position: relative;
+      top: -1px;
+      left: -1px;
+    }
+  }
+}

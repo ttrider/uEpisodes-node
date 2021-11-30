@@ -135,3 +135,37 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.command-button {
+  padding: 0;
+  border: none;
+  font-size: inherit;
+  align-items: center;
+  background: none;
+  cursor: pointer;
+  position: relative;
+}
+.command-button:hover {
+  color: brown;
+}
+.command-button:hover svg {
+  position: relative;
+  top: -1px;
+  left: -1px;
+}
+.command-button:active {
+  color: brown;
+}
+.command-button:active svg {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+.command-button:focus-visible {
+  outline: none;
+  color: brown;
+}
+.command-button:focus-visible svg {
+  position: relative;
+  top: -1px;
+  left: -1px;
+}

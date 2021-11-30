@@ -16,13 +16,59 @@
       </div>
     </div>
     <template v-if="showInfo">
-      <div class="ti-column">{{ showName }}</div>
+      <div class="ti-column">
+        {{ showName }}
+      </div>
       <div class="ti-column">{{ season }}</div>
       <div class="ti-column">{{ episode }}</div>
       <div class="ti-column">{{ episodeName }}</div>
     </template>
     <div class="ti-column" v-if="showProgress">{{ status }}</div>
-    <div class="ti-column">CMD</div>
+    <div class="ti-column">
+      <button class="command-button" title="remove" @click="onRemoveFileItem">
+        <Icon tag="span" size="20px" class="command-button">
+          <RemoveCircleOutlineFilled />
+        </Icon>
+      </button>
+    </div>
+
+    <!-- candidates here -->
+    <template v-if="candidates.length > 1">
+      <template v-for="c in candidates">
+        <div :key="id + c.signature + '1'"></div>
+        <div
+          :key="id + c.signature + '2'"
+          class="ti-column"
+          style="color: brown"
+        >
+          {{ c.showName }}
+        </div>
+        <div
+          :key="id + c.signature + '3'"
+          class="ti-column"
+          style="color: brown"
+        >
+          {{ c.season }}
+        </div>
+        <div
+          :key="id + c.signature + '4'"
+          class="ti-column"
+          style="color: brown"
+        >
+          {{ c.episode }}
+        </div>
+        <div
+          :key="id + c.signature + '5'"
+          class="ti-column"
+          style="color: brown"
+        >
+          {{ c.episodeName }}
+        </div>
+        <div :key="id + c.signature + '6'"></div>
+        <div :key="id + c.signature + '7'"></div>
+      </template>
+    </template>
+
     <template v-if="expanded">
       <u-tree-item
         v-for="fi in children"
@@ -44,11 +90,13 @@ import {
   KeyboardArrowDownOutlined,
   KeyboardArrowRightOutlined,
   OndemandVideoOutlined,
+  RemoveCircleOutlineFilled,
   SettingsOutlined,
 } from "@v2icons/material";
 import { Icon } from "@v2icons/utils";
 import path from "path";
 import { FileSystemItem } from "../model/file-item";
+import store from "@/store";
 
 @Component({
   components: {
@@ -61,6 +109,7 @@ import { FileSystemItem } from "../model/file-item";
     KeyboardArrowDownOutlined,
     KeyboardArrowRightOutlined,
     OndemandVideoOutlined,
+    RemoveCircleOutlineFilled,
     SettingsOutlined,
   },
 })
@@ -171,10 +220,25 @@ export default class TreeItem extends Vue {
     return this.item.status ?? "";
   }
 
+  get candidates() {
+    if (this.item.candidates.length > 1) {
+      return this.item.candidates;
+    }
+    return [];
+  }
+
+  get id() {
+    return this.item.id;
+  }
+
   titleClick() {
     if (this.item) {
       this.item.expanded = !this.item.expanded;
     }
+  }
+
+  onRemoveFileItem() {
+    store.commit("workset/removeFileItem", this.id);
   }
 }
 </script>

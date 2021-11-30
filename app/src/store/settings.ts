@@ -24,27 +24,11 @@ export interface SettingsState {
 @Module({ dynamic: true, store, name: "settings", namespaced: true })
 class Settings extends VuexModule implements SettingsState {
   data: SettingsData = getDefaultSettings();
-  fileTypes: {
-    [name: string]: FileTypes;
-  } = {};
+  get fileTypes() {
+    return this.data.fileTypes;
+  }
 
   @Mutation settingsFile(settingsFile: SettingsData) {
-    // parse it here
-    let fileTypes: {
-      [name: string]: FileTypes;
-    } = {};
-
-    for (const typeItem of ["other", "image", "caption", "video"]) {
-      const ti = typeItem as FileTypes;
-      fileTypes = parseFileTypesString(settingsFile.fileTypes?.[ti]).reduce<{
-        [name: string]: FileTypes;
-      }>((data, item) => {
-        data[item] = ti;
-        return data;
-      }, fileTypes);
-    }
-    this.fileTypes = fileTypes;
-
     this.data = settingsFile;
   }
 
@@ -62,17 +46,20 @@ class Settings extends VuexModule implements SettingsState {
       ".uepisodes.json"
     );
 
-    let data = getDefaultSettings();
+    const defaultData = getDefaultSettings();
 
     if (existsSync(settingsPath)) {
       const fb = await fs.readFile(settingsPath);
       if (fb) {
         const fbs = fb.toString();
-        data = _.merge(data, JSON.parse(fbs));
+        const newData = JSON.parse(fbs);
+        const data = _.merge({}, defaultData, newData);
+        store.commit("settings/settingsFile", data);
+        return data;
       }
     }
-    store.commit("settings/settingsFile", data);
-    return data;
+    store.commit("settings/settingsFile", defaultData);
+    return defaultData;
   }
 
   @Action({})
@@ -82,28 +69,7 @@ class Settings extends VuexModule implements SettingsState {
       ".uepisodes.json"
     );
 
-    // process fileTypes
-    const typeSets: { [id: string]: string[] } = {
-      video: [],
-      image: [],
-      caption: [],
-      other: [],
-    };
-    for (const ext in this.fileTypes) {
-      if (Object.prototype.hasOwnProperty.call(this.fileTypes, ext)) {
-        const fileType = this.fileTypes[ext];
-        typeSets[fileType].push(ext);
-      }
-    }
-    const data = { ...this.data };
-    data.fileTypes = {
-      video: typeSets.video.join(", "),
-      image: typeSets.image.join(", "),
-      caption: typeSets.caption.join(", "),
-      other: typeSets.other.join(", "),
-    };
-
-    await fs.writeFile(settingsPath, JSON.stringify(data, null, 2));
+    await fs.writeFile(settingsPath, JSON.stringify(this.data, null, 2));
   }
 }
 

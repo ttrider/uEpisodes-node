@@ -26,6 +26,13 @@ class Workset extends VuexModule implements WorksetState {
     }
   }
 
+  @Mutation removeFileItem(id: string) {
+    const target = this.fileItems.findIndex((i) => i.id == id);
+    if (target != -1) {
+      this.fileItems.splice(target, 1);
+    }
+  }
+
   @Action({ commit: "addWorkItems" })
   async addFiles(files: string[]) {
     const workItems: FileSystemItem[] = [];

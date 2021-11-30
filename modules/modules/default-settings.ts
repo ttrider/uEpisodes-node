@@ -1,10 +1,7 @@
 export interface SettingsData {
   version: number;
   fileTypes: {
-    video?: string;
-    caption?: string;
-    other?: string;
-    image?: string;
+    [name: string]: "video" | "caption" | "other" | "image"
   };
 
   ignorePatterns: string[];
@@ -35,11 +32,50 @@ export interface SettingsData {
 
 export function getDefaultSettings() {
   const defaultSettings: SettingsData = {
-    version: 1,
+    version: 1, 
+    
     fileTypes: {
-      video:
-        ".3g2, .amv, .asf, .avi, .drc, .f4a, .f4b, .f4p, .f4v, .flv, .M2TS, .m2v, .m4p, .m4v, .mkv, .mng, .mov, .mp2, .mp4, .mpe, .mpeg, .mpg, .mpv, .MTS, .mxf, .nsv, .ogg, .ogv, .qt, .rm, .rmvb, .roq, .svi, .viv, .vob, .webm, .wmv, .yuv, ",
-      caption: ".srt, .scc, .stl",
+      ".3g2": "video",
+      ".amv": "video",
+      ".asf": "video",
+      ".avi": "video",
+      ".drc": "video",
+      ".f4a": "video",
+      ".f4b": "video",
+      ".f4p": "video",
+      ".f4v": "video",
+      ".flv": "video",
+      ".m2ts": "video",
+      ".m2v": "video",
+      ".m4p": "video",
+      ".m4v": "video",
+      ".mkv": "video",
+      ".mng": "video",
+      ".mov": "video",
+      ".mp2": "video",
+      ".mp4": "video",
+      ".mpe": "video",
+      ".mpeg": "video",
+      ".mpg": "video",
+      ".mpv": "video",
+      ".mts": "video",
+      ".mxf": "video",
+      ".nsv": "video",
+      ".ogg": "video",
+      ".ogv": "video",
+      ".qt": "video",
+      ".rm": "video",
+      ".rmvb": "video",
+      ".roq": "video",
+      ".svi": "video",
+      ".viv": "video",
+      ".vob": "video",
+      ".webm": "video",
+      ".wmv": "video",
+      ".yuv,": "video",
+      ".srt": "caption",
+      ".scc": "caption",
+      ".stl": "caption",
     },
     ignorePatterns: [
       "\\[\\swww\\storrenting\\scom\\s\\]",
