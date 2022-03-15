@@ -7,11 +7,13 @@ import {
 } from "vuex-module-decorators";
 import store from "../store";
 import path from "path";
-import fs from "fs/promises";
+import fss from "fs";
 import { existsSync } from "fs";
 import { remote } from "electron";
 import _ from "lodash";
 import { getDefaultSettings, SettingsData } from "uepisodes-modules";
+
+const fs = fss.promises;
 
 export type FileTypes = "video" | "image" | "caption" | "other";
 
@@ -20,12 +22,26 @@ export interface SettingsState {
   fileTypes: {
     [name: string]: FileTypes;
   };
+  sampleFolderNames: string[];
+
+  showVideoOnly: boolean;
 }
 @Module({ dynamic: true, store, name: "settings", namespaced: true })
 class Settings extends VuexModule implements SettingsState {
   data: SettingsData = getDefaultSettings();
   get fileTypes() {
     return this.data.fileTypes;
+  }
+  get sampleFolderNames() {
+    return this.data.sampleFolderNames;
+  }
+  get showVideoOnly() {
+    return this.data.presentation.videoOnly;
+  }
+
+  @Mutation updateShowVideoOnly(value: boolean) {
+    this.data.presentation.videoOnly = value;
+    store.dispatch("settings/saveFile");
   }
 
   @Mutation settingsFile(settingsFile: SettingsData) {

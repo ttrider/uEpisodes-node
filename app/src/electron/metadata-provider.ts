@@ -2,6 +2,8 @@ import path from "path";
 import {
   filePathParser,
   getMetadataCandidates,
+  lookupMetadataCandidates,
+  ShowEpisodeCandidate,
   ShowEpisodeInfo,
 } from "uepisodes-modules";
 import { client } from "./http-client";
@@ -39,4 +41,12 @@ export async function provideMetadata(params: {
     console.error(e);
     return [];
   }
+}
+
+export function lookupMetadata(params: {
+  showName: string;
+  season: string;
+  episode: string;
+}): Promise<ShowEpisodeCandidate[]> {
+  return lookupMetadataCandidates(client, params);
 }

@@ -1,6 +1,6 @@
 {
-  "name": "ue-app",
-  "version": "0.1.0",
+  "name": "uepisodes",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

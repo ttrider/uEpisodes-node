@@ -7,9 +7,12 @@ import {
 } from "vuex-module-decorators";
 import store from "../store";
 import path from "path";
-import fs from "fs/promises";
+import fss from "fs";
 import { FileSystemItem } from "../model/file-item";
 import Vue from "vue";
+import { SettingsModule } from "./settings";
+
+const fs = fss.promises;
 
 export interface WorksetState {
   fileItems: FileSystemItem[];
@@ -27,9 +30,19 @@ class Workset extends VuexModule implements WorksetState {
   }
 
   @Mutation removeFileItem(id: string) {
-    const target = this.fileItems.findIndex((i) => i.id == id);
-    if (target != -1) {
-      this.fileItems.splice(target, 1);
+    const targetPath = lookupFileItem(this.fileItems, id.split(path.sep));
+    if (targetPath) {
+      if (targetPath.length === 1) {
+        this.fileItems = [];
+      } else {
+        const parent = targetPath[targetPath.length - 2];
+        if (parent) {
+          const target = parent.children.findIndex((i) => i.id == id);
+          if (target != -1) {
+            parent.children.splice(target, 1);
+          }
+        }
+      }
     }
   }
 
@@ -41,6 +54,26 @@ class Workset extends VuexModule implements WorksetState {
     }
     return workItems;
   }
+}
+
+function lookupFileItem(
+  fileItems: FileSystemItem[],
+  itemParts: string[]
+): FileSystemItem[] | undefined {
+  const id = itemParts.shift();
+  const fi = fileItems.find((i) => i.name === id);
+  if (fi) {
+    if (itemParts.length === 0) {
+      // found it!
+      return [fi];
+    }
+    const ret = lookupFileItem(fi.children, itemParts);
+    if (ret) {
+      ret.unshift(fi);
+      return ret;
+    }
+  }
+  return undefined;
 }
 
 function mergeInFileItem(
@@ -70,12 +103,20 @@ function mergeInFileItem(
     newItemObservable.initialize();
   } else {
     // let's make a folder
-    const folder = new FileSystemItem({
-      filePath: newItem.pathParts.slice(0, level + 1).join(path.sep),
-      mode: "folder",
-    });
-    fileItems.push(folder);
-    mergeInFileItem(folder.children, newItem, level + 1);
+    // let's check if this is a 'samples' folder
+
+    const partlc = part.toLowerCase();
+    const sampleIndex = SettingsModule.sampleFolderNames.findIndex(
+      (f) => f === partlc
+    );
+    if (sampleIndex != -1) {
+      const folder = new FileSystemItem({
+        filePath: newItem.pathParts.slice(0, level + 1).join(path.sep),
+        mode: "folder",
+      });
+      fileItems.push(folder);
+      mergeInFileItem(folder.children, newItem, level + 1);
+    }
   }
 }
 

@@ -3,8 +3,8 @@
     <div class="tree-view">
       <div>Path</div>
       <div>Show</div>
-      <div>S#</div>
-      <div>E#</div>
+      <div></div>
+      <div></div>
       <div>Name</div>
       <div></div>
       <div></div>

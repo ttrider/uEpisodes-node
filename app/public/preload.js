@@ -10,5 +10,9 @@ console.info("preload");
 function provideMetadata(params) {
   return ipcRenderer.invoke("provide-metadata", params);
 }
+function lookupMetadata(params) {
+  return ipcRenderer.invoke("lookup-metadata", params);
+}
 window.provideMetadata = provideMetadata;
+window.lookupMetadata = lookupMetadata;
 window.myApi = { desktop: true };

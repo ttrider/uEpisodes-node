@@ -1,74 +1,57 @@
 <template>
-  <span v-if="item" style="display: contents">
-    <div class="ti-title ti-column" :style="titleStyle" @click="titleClick">
-      <Icon v-if="mode === 'folder'" tag="div" size="18px">
-        <KeyboardArrowDownOutlined v-if="expanded" />
-        <KeyboardArrowRightOutlined v-else />
-      </Icon>
-      <div v-else style="min-width: 18px; width: 18px"></div>
-      <Icon tag="div">
-        <component :is="icon" />
-      </Icon>
-      <div
-        style="padding-left: 0.25em; text-overflow: ellipsis; overflow: hidden"
-      >
-        {{ title }}
-      </div>
-    </div>
-    <template v-if="showInfo">
-      <div class="ti-column">
-        {{ showName }}
-      </div>
-      <div class="ti-column">{{ season }}</div>
-      <div class="ti-column">{{ episode }}</div>
-      <div class="ti-column">{{ episodeName }}</div>
-    </template>
-    <div class="ti-column" v-if="showProgress">{{ status }}</div>
-    <div class="ti-column">
-      <button class="command-button" title="remove" @click="onRemoveFileItem">
-        <Icon tag="span" size="20px" class="command-button">
-          <RemoveCircleOutlineFilled />
+  <span v-if="item && visible" style="display: contents" :class="className"
+    ><span class="ti-item">
+      <div class="ti-title ti-column" :style="titleStyle" @click="titleClick">
+        <Icon v-if="mode === 'folder'" tag="div" size="18px">
+          <KeyboardArrowDownOutlined v-if="expanded" />
+          <KeyboardArrowRightOutlined v-else />
         </Icon>
-      </button>
-    </div>
-
-    <!-- candidates here -->
-    <template v-if="candidates.length > 1">
-      <template v-for="c in candidates">
-        <div :key="id + c.signature + '1'"></div>
-        <div
-          :key="id + c.signature + '2'"
-          class="ti-column"
-          style="color: brown"
-        >
-          {{ c.showName }}
+        <div v-else style="min-width: 18px; width: 18px"></div>
+        <Icon tag="div">
+          <component :is="icon" />
+        </Icon>
+        <div class="ti-text" style="padding-left: 0.25em">
+          {{ title }}
         </div>
-        <div
-          :key="id + c.signature + '3'"
-          class="ti-column"
-          style="color: brown"
-        >
-          {{ c.season }}
+      </div>
+      <template v-if="showInfo">
+        <div class="ti-column">
+          <div class="ti-text">{{ showName }}</div>
         </div>
-        <div
-          :key="id + c.signature + '4'"
-          class="ti-column"
-          style="color: brown"
-        >
-          {{ c.episode }}
+        <div class="ti-column">{{ season }}</div>
+        <div class="ti-column">{{ episode }}</div>
+        <div class="ti-column">
+          <div class="ti-text">{{ episodeName }}</div>
         </div>
-        <div
-          :key="id + c.signature + '5'"
-          class="ti-column"
-          style="color: brown"
-        >
-          {{ c.episodeName }}
-        </div>
-        <div :key="id + c.signature + '6'"></div>
-        <div :key="id + c.signature + '7'"></div>
       </template>
-    </template>
+      <div class="ti-column" v-if="showProgress">{{ status }}</div>
+      <div class="ti-column ti-command-column">
+        <button
+          v-if="mode === 'folder'"
+          class="command-button"
+          title="mark as Sample"
+        >
+          <Icon tag="span" size="1em" class="command-button">
+            <RuleFolderOutlined />
+          </Icon>
+        </button>
 
+        <button v-if="mode === 'video'" class="command-button" title="remove">
+          <Icon tag="span" size="1em" class="command-button">
+            <EditOutlined />
+          </Icon>
+        </button>
+
+        <button class="command-button" title="remove" @click="onRemoveFileItem">
+          <Icon tag="span" size="1em" class="command-button">
+            <CancelOutlined />
+          </Icon>
+        </button>
+      </div>
+
+      <!-- candidates here -->
+      <u-tree-item-editor v-if="candidates.length > 1" :item="item" />
+    </span>
     <template v-if="expanded">
       <u-tree-item
         v-for="fi in children"
@@ -92,11 +75,15 @@ import {
   OndemandVideoOutlined,
   RemoveCircleOutlineFilled,
   SettingsOutlined,
+  CancelOutlined,
+  EditOutlined,
+  RuleFolderOutlined,
 } from "@v2icons/material";
 import { Icon } from "@v2icons/utils";
 import path from "path";
 import { FileSystemItem } from "../model/file-item";
 import store from "@/store";
+import { SettingsModule } from "@/store/settings";
 
 @Component({
   components: {
@@ -111,6 +98,9 @@ import store from "@/store";
     OndemandVideoOutlined,
     RemoveCircleOutlineFilled,
     SettingsOutlined,
+    CancelOutlined,
+    EditOutlined,
+    RuleFolderOutlined,
   },
 })
 export default class TreeItem extends Vue {
@@ -131,6 +121,10 @@ export default class TreeItem extends Vue {
 
   get showProgress() {
     return this.mode !== "other";
+  }
+
+  get className() {
+    return "ti-status-" + this.item.status;
   }
 
   get icon() {
@@ -207,10 +201,16 @@ export default class TreeItem extends Vue {
     return this.item.showName ?? "";
   }
   get season() {
-    return this.item.season ?? "";
+    if (this.item.season != undefined) {
+      return "S" + this.item.season.toString().padStart(2, "0");
+    }
+    return "";
   }
   get episode() {
-    return this.item.episode ?? "";
+    if (this.item.episode != undefined) {
+      return "E" + this.item.episode.toString().padStart(2, "0");
+    }
+    return "";
   }
   get episodeName() {
     return this.item.episodeName ?? "";
@@ -229,6 +229,14 @@ export default class TreeItem extends Vue {
 
   get id() {
     return this.item.id;
+  }
+
+  get visible() {
+    return (
+      this.item.mode === "video" ||
+      this.item.mode === "folder" ||
+      !SettingsModule.showVideoOnly
+    );
   }
 
   titleClick() {

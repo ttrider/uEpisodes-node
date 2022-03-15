@@ -83,39 +83,41 @@ export class FileSystemItem {
           }
         }
 
-        this.candidates = await provideMetadata({
-          basePath: this.basePath ?? "",
-          filePath: this.filePath,
-        });
+        if (this.mode === "video") {
+          this.candidates = await provideMetadata({
+            basePath: this.basePath ?? "",
+            filePath: this.filePath,
+          });
 
-        // const parts = this.basePath
-        //   ? path.resolve(this.basePath, this.filePath).split(path.sep)
-        //   : [this.name];
+          // const parts = this.basePath
+          //   ? path.resolve(this.basePath, this.filePath).split(path.sep)
+          //   : [this.name];
 
-        // const fileMetadata = filePathParser(parts, SettingsModule.data);
+          // const fileMetadata = filePathParser(parts, SettingsModule.data);
 
-        // this.candidates = (
-        //   await getMetadataCandidates(client, fileMetadata)
-        // ).map<ShowEpisodeInfo>((c) => ({
-        //   showName: c.showMetadata.title,
-        //   season: c.episodeMetadata.season,
-        //   episode: c.episodeMetadata.episode,
-        //   episodeAlt: c.episodeMetadataAlt?.episode,
-        //   episodeName: c.episodeMetadata.title,
-        //   episodeNameAlt: c.episodeMetadataAlt?.title,
-        //   signature: c.signature,
-        // }));
+          // this.candidates = (
+          //   await getMetadataCandidates(client, fileMetadata)
+          // ).map<ShowEpisodeInfo>((c) => ({
+          //   showName: c.showMetadata.title,
+          //   season: c.episodeMetadata.season,
+          //   episode: c.episodeMetadata.episode,
+          //   episodeAlt: c.episodeMetadataAlt?.episode,
+          //   episodeName: c.episodeMetadata.title,
+          //   episodeNameAlt: c.episodeMetadataAlt?.title,
+          //   signature: c.signature,
+          // }));
 
-        if (this.candidates.length > 0) {
-          const candidate = this.candidates[0];
-          this.showName = candidate.showName;
-          this.season = candidate.season;
-          this.episode = candidate.episode;
-          this.episodeAlt = candidate.episodeAlt ?? null;
-          this.episodeName = candidate.episodeName;
-          this.episodeNameAlt = candidate.episodeNameAlt ?? null;
+          if (this.candidates.length > 0) {
+            const candidate = this.candidates[0];
+            this.showName = candidate.showName;
+            this.season = candidate.season;
+            this.episode = candidate.episode;
+            this.episodeAlt = candidate.episodeAlt ?? null;
+            this.episodeName = candidate.episodeName;
+            this.episodeNameAlt = candidate.episodeNameAlt ?? null;
+          }
         }
-        this.status = "";
+        this.status = this.candidates.length === 1 ? "ready" : "";
       }
     }
   }

@@ -1,11 +1,13 @@
 import path from "path";
 import os from "os";
-import { stat, mkdir, writeFile, readFile, utimes } from "fs/promises";
+import * as fss from "fs";
 import axios, { AxiosResponse } from "axios";
 import { getLogger } from "./logger";
 import { maxAge, parseDate } from "./common";
 import lru from "lru-cache";
 import { HttpClient } from "..";
+
+const { stat, mkdir, writeFile, readFile, utimes } = fss.promises;
 
 const lruOptions = { maxAge: maxAge };
 const metadataLRU = new lru(lruOptions);

@@ -1,5 +1,9 @@
 export interface SettingsData {
   version: number;
+  presentation: {
+    videoOnly: boolean;
+  }
+  sampleFolderNames: string[];
   fileTypes: {
     [name: string]: "video" | "caption" | "other" | "image"
   };
@@ -32,8 +36,13 @@ export interface SettingsData {
 
 export function getDefaultSettings() {
   const defaultSettings: SettingsData = {
-    version: 1, 
-    
+    version: 1,
+    presentation: {
+      videoOnly: false
+    },
+
+    sampleFolderNames: ["sample", "samples"],
+
     fileTypes: {
       ".3g2": "video",
       ".amv": "video",

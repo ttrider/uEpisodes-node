@@ -5,6 +5,7 @@
       <u-button title="Add Video File" icon="settings" @click="openFile" />
       <u-button title="Add Folder File" icon="settings" @click="openFolder" />
       <u-button title="settings" icon="settings" @click="settings" />
+      <input type="checkbox" v-model="showVideoOnly" class="showVideoOnlyCheckbox"/>
     </header>
     <router-view class="view-host" />
   </div>
@@ -14,9 +15,20 @@
 import { Component, Vue } from "vue-property-decorator";
 import { remote } from "electron";
 import { WorksetModule } from "./store/workset";
+import { SettingsModule } from "./store/settings";
+import store from "./store";
 
 @Component({ components: {} })
 export default class App extends Vue {
+
+  get showVideoOnly(){
+    return SettingsModule.showVideoOnly;
+  }
+  set showVideoOnly(value:boolean){
+    store.commit("settings/updateShowVideoOnly",value);
+  }
+
+
   openFile() {
     const results = remote.dialog.showOpenDialogSync({
       title: "Add Video File",
@@ -71,6 +83,8 @@ export default class App extends Vue {
       WorksetModule.addFiles(files);
     }
   }
+
+
 
   settings() {
     this.$router.replace("about");

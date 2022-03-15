@@ -13,7 +13,7 @@ import {
   ShowEpisodeInfo,
 } from "uepisodes-modules";
 import { client } from "./electron/http-client";
-import { provideMetadata } from "./electron/metadata-provider";
+import { lookupMetadata, provideMetadata } from "./electron/metadata-provider";
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -30,6 +30,20 @@ ipcMain.handle(
   "provide-metadata",
   (e, arg: { basePath: string; filePath: string }) => {
     return provideMetadata(arg);
+  }
+);
+
+ipcMain.handle(
+  "lookup-metadata",
+  (
+    e,
+    params: {
+      showName: string;
+      season: string;
+      episode: string;
+    }
+  ) => {
+    return lookupMetadata(params);
   }
 );
 

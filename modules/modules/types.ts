@@ -63,6 +63,17 @@ export interface ShowEpisodeInfo {
   signature?: string;
 }
 
+export interface ShowEpisodeCandidate {
+  showId: string;
+  showName: string;
+  season?: number;
+  episode?: number;
+  episodeAlt?: number;
+  episodeName?: string;
+  episodeNameAlt?: string;
+  signature?: string;
+}
+
 export interface HttpClient {
   get(url: string): Promise<{
     data: any;

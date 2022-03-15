@@ -6,6 +6,7 @@ import {
   EpisodeTree,
   FileMetadata,
   ShowMetadataSet,
+  ShowEpisodeCandidate,
 } from "./types";
 import { getTokens, parseCSV, parseDate, parseNumber } from "./common";
 
@@ -136,6 +137,74 @@ export async function getMetadataCandidates(
   }
 }
 
+export async function lookupMetadataCandidates(httpClient: HttpClient,
+  params: {
+    showName: string;
+    season: string;
+    episode: string;
+  }) {
+
+  const showName = params.showName ?? "";
+  if (!showName || showName.trim().length < 3) {
+    return [];
+  }
+  const seasonNameValue = parseInt(params.season ?? "");
+  const seasonName = isNaN(seasonNameValue) ? "" : seasonNameValue.toString();
+
+  const episodeNameValue = parseInt(params.episode ?? "");
+  const episodeName = isNaN(episodeNameValue) ? "" : episodeNameValue.toString();
+
+  const showNameTokens = getTokens(showName);
+
+  const showCandidates: ShowEpisodeCandidate[] = [];
+
+  const allShows = await getShows(httpClient);
+  for (const showId in allShows) {
+    if (Object.prototype.hasOwnProperty.call(allShows, showId)) {
+      const show = allShows[showId];
+
+      if (isPrefixTokens(show.tokens, showNameTokens)) {
+
+        const showEpisodes = await getShowById(httpClient, showId);
+
+        const episodeCandidates =
+          showEpisodes.episodes.filter(ep => {
+
+            if (seasonName) {
+              if (!ep.season.toString().startsWith(seasonName)) {
+                return false;
+              }
+            }
+
+            if (episodeName) {
+              if (!ep.episode.toString().startsWith(episodeName)) {
+                return false;
+              }
+            }
+            return true;
+          }).map(ep => ({
+            showId,
+            showName: show.title,
+            episodeName: ep.title,
+            ...ep
+          }));
+
+        if (episodeCandidates.length > 0) {
+          showCandidates.push(...episodeCandidates);
+
+        } else {
+          showCandidates.push({
+            showId,
+            showName: show.title,
+          });
+        }
+      }
+    }
+  }
+
+  return showCandidates;
+}
+
 function getCandidates(shows: ShowMetadataSet, tokens: string[][]) {
   const showCandidates = [];
   for (const showCandidate of tokens) {
@@ -197,6 +266,23 @@ function compareTokens(tokensA: string[], tokensB: string[]) {
   }
   ret.b = setB.size;
   return ret;
+}
+
+function isPrefixTokens(tokens: string[], prefixTokens: string[]) {
+
+  if (prefixTokens.length > tokens.length) {
+    return false;
+  }
+  for (let index = 0; index < prefixTokens.length; index++) {
+    const token = tokens[index];
+    const prefix = prefixTokens[index];
+
+    if (!token.startsWith(prefix)) {
+      return false;
+    }
+
+  }
+  return true;
 }
 
 async function processShowList(dataString: string) {
