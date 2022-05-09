@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="tree-view">
-      <div>Path</div>
+      <div>Path - {{ items.length }}</div>
       <div>Show</div>
       <div></div>
       <div></div>

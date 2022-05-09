@@ -109,7 +109,7 @@ function mergeInFileItem(
     const sampleIndex = SettingsModule.sampleFolderNames.findIndex(
       (f) => f === partlc
     );
-    if (sampleIndex != -1) {
+    if (sampleIndex === -1) {
       const folder = new FileSystemItem({
         filePath: newItem.pathParts.slice(0, level + 1).join(path.sep),
         mode: "folder",
