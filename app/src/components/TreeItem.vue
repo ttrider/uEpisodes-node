@@ -51,6 +51,10 @@
 
       <!-- candidates here -->
       <u-tree-item-editor v-if="candidates.length > 1" :item="item" />
+
+      <u-tree-item-action :item="item" :level="level" />
+      <u-tree-item-action :item="item" :level="level" />
+      <u-tree-item-action :item="item" :level="level" />
     </span>
     <template v-if="expanded">
       <u-tree-item

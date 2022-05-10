@@ -23,6 +23,8 @@ export interface SettingsData {
     [signature: string]: string;
   };
 
+  actionPatterns: { action: 'copy' | 'move' | 'rename', pattern: string }[];
+
   torrentClient?: {
     url: string;
     user: string;
@@ -145,6 +147,13 @@ export function getDefaultSettings() {
         seasonIndex: 3,
       },
     ],
+
+    actionPatterns: [
+      {
+        action: "rename",
+        pattern: "${show} - S${season}E${episode}. ${title}"
+      }
+    ]
   };
   return defaultSettings;
 }

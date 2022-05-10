@@ -8,6 +8,7 @@ import Button from "./components/Button.vue";
 import TreeItem from "./components/TreeItem.vue";
 import TreeItemEditor from "./components/TreeItemEditor.vue";
 import TreeItemEditorCandidate from "./components/TreeItemEditorCandidate.vue";
+import TreeItemAction from "./components/TreeItemAction.vue";
 
 Vue.config.productionTip = false;
 
@@ -16,6 +17,7 @@ Vue.component("u-button", Button);
 Vue.component("u-tree-item", TreeItem);
 Vue.component("u-tree-item-editor", TreeItemEditor);
 Vue.component("u-tree-item-editor-candidate", TreeItemEditorCandidate);
+Vue.component("u-tree-item-action", TreeItemAction);
 
 new Vue({
   router,
