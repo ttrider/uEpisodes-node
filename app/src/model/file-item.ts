@@ -2,6 +2,7 @@ import path from "path";
 import { FileTypes, SettingsModule } from "../store/settings";
 import ft from "file-type";
 import {
+  ActionManagerClient,
   filePathParser,
   getMetadataCandidates,
   ShowEpisodeInfo,
@@ -12,6 +13,13 @@ const provideMetadata: (params: {
   basePath: string;
   filePath: string;
 }) => Promise<ShowEpisodeInfo[]> = (window as any).provideMetadata;
+
+const actionClient = new ActionManagerClient();
+actionClient.enqueueActions([
+  {
+    id: "foo-foo",
+  },
+]);
 
 export class FileSystemItem {
   filePath: string;
@@ -56,6 +64,34 @@ export class FileSystemItem {
   }
   get id() {
     return this.filePath;
+  }
+
+  get actions(): ActionItem[] {
+    const actions = [];
+    if (this.mode === "video" && this.status === "ready") {
+      const renameAction = SettingsModule.data.renameAction
+        ? new RenameActionItem(this, SettingsModule.data.renameAction)
+        : undefined;
+
+      actions.push(renameAction);
+
+      const copyActions = SettingsModule.data.copyActions.map(
+        (ap) => new CopyActionItem(this, ap, renameAction)
+      );
+      actions.push(...copyActions);
+
+      const moveAction = SettingsModule.data.moveAction
+        ? new MoveActionItem(
+            this,
+            SettingsModule.data.moveAction,
+            renameAction,
+            ...copyActions
+          )
+        : undefined;
+
+      actions.push(moveAction);
+    }
+    return actions.filter((a) => !!a) as ActionItem[];
   }
 
   async initialize() {
@@ -120,5 +156,96 @@ export class FileSystemItem {
         this.status = this.candidates.length === 1 ? "ready" : "";
       }
     }
+  }
+}
+
+export abstract class ActionItem {
+  protected dependsOn: ActionItem[];
+
+  status = "";
+
+  protected waitFor: Promise<void> | undefined;
+
+  constructor(
+    protected parent: FileSystemItem,
+    protected options: { pattern: string },
+    ...dependsOn: (ActionItem | undefined)[]
+  ) {
+    this.dependsOn = dependsOn.filter((a) => !!a) as ActionItem[];
+  }
+
+  run(): Promise<void> {
+    // check dependencies
+
+    const depActions = this.dependsOn.map((dep) => {
+      if (dep.waitFor) {
+        return dep.waitFor;
+      }
+      return dep.run();
+    });
+    this.status = "waiting";
+    this.waitFor = Promise.all(depActions)
+      .then(() => {
+        this.status = "running";
+        return this.doRun();
+      })
+      .then(() => {
+        this.status = "completed";
+      })
+      .catch(() => {
+        this.status = "error";
+      });
+    return this.waitFor;
+  }
+
+  abstract doRun(): Promise<void>;
+}
+
+export class RenameActionItem extends ActionItem {
+  async doRun() {
+    return new Promise<void>((resolve) => {
+      let n = 0;
+      const i = setInterval(() => {
+        n += 10;
+        this.status = `running: ${n}%`;
+      }, 1000);
+
+      setTimeout(() => {
+        clearInterval(i);
+        resolve();
+      }, 10000);
+    });
+  }
+}
+export class CopyActionItem extends ActionItem {
+  async doRun() {
+    return new Promise<void>((resolve) => {
+      let n = 0;
+      const i = setInterval(() => {
+        n += 10;
+        this.status = `running: ${n}%`;
+      }, 1000);
+
+      setTimeout(() => {
+        clearInterval(i);
+        resolve();
+      }, 10000);
+    });
+  }
+}
+export class MoveActionItem extends ActionItem {
+  async doRun() {
+    return new Promise<void>((resolve) => {
+      let n = 0;
+      const i = setInterval(() => {
+        n += 10;
+        this.status = `running: ${n}%`;
+      }, 1000);
+
+      setTimeout(() => {
+        clearInterval(i);
+        resolve();
+      }, 10000);
+    });
   }
 }

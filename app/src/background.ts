@@ -1,8 +1,9 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, ipcMain, net } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, webContents } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
+import { ActionManager, ActionManagerIPC } from "uepisodes-modules";
 import path from "path";
 const isDevelopment = process.env.NODE_ENV !== "production";
 import {
@@ -25,6 +26,8 @@ declare const __static: string;
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
 ]);
+
+const actionManger = new ActionManager(ipcMain as unknown as ActionManagerIPC);
 
 ipcMain.handle(
   "provide-metadata",
@@ -96,6 +99,8 @@ async function createWindow() {
     },
   });
 
+  actionManger.sender = win.webContents;
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
@@ -156,11 +161,13 @@ if (isDevelopment) {
   if (process.platform === "win32") {
     process.on("message", (data) => {
       if (data === "graceful-exit") {
+        actionManger.dispose();
         app.quit();
       }
     });
   } else {
     process.on("SIGTERM", () => {
+      actionManger.dispose();
       app.quit();
     });
   }

@@ -6,4 +6,5 @@ export * from "./modules/logger";
 export * from "./modules/name-parser";
 export * from "./modules/types";
 export * from "./modules/epguides-provider";
+export * from "./modules/action-manager";
 

@@ -13,6 +13,8 @@ function provideMetadata(params) {
 function lookupMetadata(params) {
   return ipcRenderer.invoke("lookup-metadata", params);
 }
+
+window.ipcRenderer = ipcRenderer;
 window.provideMetadata = provideMetadata;
 window.lookupMetadata = lookupMetadata;
 window.myApi = { desktop: true };

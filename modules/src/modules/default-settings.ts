@@ -23,7 +23,14 @@ export interface SettingsData {
     [signature: string]: string;
   };
 
-  actionPatterns: { action: 'copy' | 'move' | 'rename', pattern: string }[];
+  renameAction?: {
+    pattern: string;
+  }
+
+  moveAction?: {
+    pattern: string;
+  }
+  copyActions: { pattern: string }[];
 
   torrentClient?: {
     url: string;
@@ -148,10 +155,21 @@ export function getDefaultSettings() {
       },
     ],
 
-    actionPatterns: [
+    renameAction: {
+      pattern: "${show} - S${season}E${episode}. ${title}"
+    },
+    moveAction: {
+      pattern: "../${show}/S${season}E${episode}. ${title}"
+    },
+    copyActions: [
       {
-        action: "rename",
-        pattern: "${show} - S${season}E${episode}. ${title}"
+        pattern: "../${show}/S${season}E${episode}. ${title}"
+      },
+      {
+        pattern: "../${show}/S${season}E${episode}. ${title}"
+      },
+      {
+        pattern: "../${show}/S${season}E${episode}. ${title}"
       }
     ]
   };
