@@ -1,184 +1,96 @@
+import { ActionItemState, ActionManagerAction } from "./action-common";
+import { IpcHandle, ipcOnEnqueue, IpcSend, ipcStateUpdate } from "./action-ipc";
+import { ActionItem, ActionItemOwner, NoneActionItem } from "./action-item";
+import { RenameActionItem, MoveActionItem, CopyActionItem, CleanupActionItem } from "./action-item-fs";
 
-
-
-
-
-export interface ActionManagerEvent {
-  send(channel: string, ...args: any[]): void;
+const actionFactory = {
+  "rename": RenameActionItem.create,
+  "move": MoveActionItem.create,
+  "copy": CopyActionItem.create,
+  "cleanup": CleanupActionItem.create,
+  "none": NoneActionItem.create,
 }
 
-export interface ActionManagerClientIPC extends NodeJS.EventEmitter {
-  on(channel: string, listener: (event: ActionManagerEvent, ...args: any[]) => void): this;
-  invoke(channel: string, ...args: any[]): Promise<any>;
+export type ActionType = keyof typeof actionFactory;
+
+export function createAction(owner: ActionItemOwner, params: ActionManagerAction): ActionItem {
+
+  const factory = actionFactory[params.type] ?? actionFactory["none"];
+
+  return factory(owner, params);
 }
 
-export interface ActionManagerIPC extends NodeJS.EventEmitter {
-  on(channel: string, listener: (event: ActionManagerEvent, ...args: any[]) => void): this;
-  //invoke(channel: string, ...args: any[]): Promise<any>;
-  handle(channel: string, listener: (event: ActionManagerEvent, ...args: any[]) => (Promise<void>) | (any)): void;
-}
+export class ActionManager implements ActionItemOwner {
 
-export interface ActionManagerSender {
-  send(channel: string, ...args: any[]): void;
-}
+  ipcMain: IpcHandle;
+  listeners: IpcSend[] = [];
+  actionItems: Record<string, ActionItem> = {};
 
-export interface ActionItemStatus {
-  id: string,
-  progress?: number;
-  status: "waiting" | "running" | "success" | "error" | "canceled"
-}
-
-export class ActionItem {
-  id: string;
-
-  constructor(id: string) {
-    this.id = id;
-  }
-}
-
-
-export class ActionManagerClient {
-  ipcRenderer: ActionManagerClientIPC;
-
-  constructor() {
-    this.ipcRenderer = (window as any).ipcRenderer;
-
-    this.ipcRenderer.on("action-manager:status", (event: ActionManagerEvent, itemStatus: ActionItemStatus) => {
-      console.info("ActionManagerClient", "action-manager:status", itemStatus);
-    });
-  }
-
-  enqueueActions(actions: ActionItem[]) {
-    this.ipcRenderer.invoke("action-manager:enqueue", {
-      actions
-    })
-  }
-}
-
-
-export class ActionManager {
-
-  ipcMain: ActionManagerIPC;
-  sender?: ActionManagerSender;
-
-  constructor(ipcMain: ActionManagerIPC) {
+  constructor(ipcMain: IpcHandle) {
     this.ipcMain = ipcMain;
 
-    this.ipcMain.handle("action-manager:enqueue", (event: ActionManagerEvent, itemStatus: ActionItemStatus) => {
-      console.info("ActionManager:", "action-manager:enqueue", itemStatus);
+    ipcOnEnqueue(this.ipcMain, (actions) => this.enqueueActions(actions));
+  }
+  onStateChanged(state: ActionItemState) {
+    for (const listener of this.listeners) {
+      ipcStateUpdate(listener, [state]);
+    }
+  }
 
+  enqueueActions(
+    actions: ActionManagerAction[]
+  ) {
 
-      setTimeout(() => {
+    const actionItemSet = actions.map(a => (
+      {
+        id: a.id,
+        actionItem: createAction(this, a),
+        dependsOn: a.dependsOn
+      })
+    );
 
-        this.sender?.send("action-manager:status", itemStatus);
+    if (actionItemSet.length !== 0) {
 
-        // this.ipcMain.invoke("action-manager:enqueue", {
-        //   id: "foobar",
-        //   status: "running",
-        //   progress: 20
-        // } as ActionItemStatus)
+      // adding items
+      for (const item of actionItemSet) {
+        if (!this.actionItems[item.id]) {
+          this.actionItems[item.id] = item.actionItem;
+        }
+      }
 
-      }, 500);
+      // adding dependencies
+      for (const item of actionItemSet) {
+        item.actionItem.dependsOnAction(...
+          item.dependsOn
+            .map(id => this.actionItems[id])
+            .filter(item => !!item) as ActionItem[]
+        );
+      }
 
-    });
+      // run items
+      for (const item of actionItemSet) {
+        this.actionItems[item.id].run();
+      }
+    }
+  }
+
+  addClientListener(listener: IpcSend) {
+    const index = this.listeners.findIndex(item => item === listener);
+    if (index === -1) {
+      this.listeners.push(listener);
+    }
+    return this;
+  }
+  removeClientListener(listener: IpcSend) {
+    const index = this.listeners.findIndex(item => item === listener);
+    if (index !== -1) {
+      this.listeners.splice(index, 1);
+    }
+    return this;
   }
 
   dispose() {
-
+    this.listeners = [];
   }
 
 }
-
-
-
-
-// export abstract class ActionItem {
-//   protected dependsOn: ActionItem[];
-
-//   status = "";
-
-//   protected waitFor: Promise<void> | undefined;
-
-//   constructor(
-//     protected parent: FileSystemItem,
-//     protected options: { pattern: string },
-//     ...dependsOn: (ActionItem | undefined)[]
-//   ) {
-//     this.dependsOn = dependsOn.filter((a) => !!a) as ActionItem[];
-//   }
-
-//   run(): Promise<void> {
-//     // check dependencies
-
-//     const depActions = this.dependsOn.map((dep) => {
-//       if (dep.waitFor) {
-//         return dep.waitFor;
-//       }
-//       return dep.run();
-//     });
-//     this.status = "waiting";
-//     this.waitFor = Promise.all(depActions)
-//       .then(() => {
-//         this.status = "running";
-//         return this.doRun();
-//       })
-//       .then(() => {
-//         this.status = "completed";
-//       })
-//       .catch(() => {
-//         this.status = "error";
-//       });
-//     return this.waitFor;
-//   }
-
-//   abstract doRun(): Promise<void>;
-// }
-
-// export class RenameActionItem extends ActionItem {
-//   async doRun() {
-//     return new Promise<void>((resolve) => {
-//       let n = 0;
-//       const i = setInterval(() => {
-//         n += 10;
-//         this.status = `running: ${n}%`;
-//       }, 1000);
-
-//       setTimeout(() => {
-//         clearInterval(i);
-//         resolve();
-//       }, 10000);
-//     });
-//   }
-// }
-// export class CopyActionItem extends ActionItem {
-//   async doRun() {
-//     return new Promise<void>((resolve) => {
-//       let n = 0;
-//       const i = setInterval(() => {
-//         n += 10;
-//         this.status = `running: ${n}%`;
-//       }, 1000);
-
-//       setTimeout(() => {
-//         clearInterval(i);
-//         resolve();
-//       }, 10000);
-//     });
-//   }
-// }
-// export class MoveActionItem extends ActionItem {
-//   async doRun() {
-//     return new Promise<void>((resolve) => {
-//       let n = 0;
-//       const i = setInterval(() => {
-//         n += 10;
-//         this.status = `running: ${n}%`;
-//       }, 1000);
-
-//       setTimeout(() => {
-//         clearInterval(i);
-//         resolve();
-//       }, 10000);
-//     });
-//   }
-// }

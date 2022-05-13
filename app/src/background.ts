@@ -1,19 +1,11 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, ipcMain, webContents } from "electron";
+import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
-import { ActionManager, ActionManagerIPC } from "uepisodes-modules";
+import { ActionManager } from "uepisodes-modules";
 import path from "path";
 const isDevelopment = process.env.NODE_ENV !== "production";
-import {
-  filePathParser,
-  getDefaultSettings,
-  getMetadataCandidates,
-  SettingsData,
-  ShowEpisodeInfo,
-} from "uepisodes-modules";
-import { client } from "./electron/http-client";
 import { lookupMetadata, provideMetadata } from "./electron/metadata-provider";
 
 if (!app.requestSingleInstanceLock()) {
@@ -27,7 +19,7 @@ protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
 ]);
 
-const actionManger = new ActionManager(ipcMain as unknown as ActionManagerIPC);
+const actionManger = new ActionManager(ipcMain);
 
 ipcMain.handle(
   "provide-metadata",
@@ -99,7 +91,7 @@ async function createWindow() {
     },
   });
 
-  actionManger.sender = win.webContents;
+  actionManger.addClientListener(win.webContents);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -110,6 +102,10 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL("app://./index.html");
   }
+
+  win.on("closed", () => {
+    actionManger.removeClientListener(win.webContents);
+  });
 }
 
 // Quit when all windows are closed.

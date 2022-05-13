@@ -1,13 +1,7 @@
 import path from "path";
 import { FileTypes, SettingsModule } from "../store/settings";
 import ft from "file-type";
-import {
-  ActionManagerClient,
-  filePathParser,
-  getMetadataCandidates,
-  ShowEpisodeInfo,
-} from "uepisodes-modules";
-import { client } from "@/electron/http-client";
+import { ActionManagerClient, ShowEpisodeInfo } from "uepisodes-modules";
 
 const provideMetadata: (params: {
   basePath: string;
@@ -15,11 +9,6 @@ const provideMetadata: (params: {
 }) => Promise<ShowEpisodeInfo[]> = (window as any).provideMetadata;
 
 const actionClient = new ActionManagerClient();
-actionClient.enqueueActions([
-  {
-    id: "foo-foo",
-  },
-]);
 
 export class FileSystemItem {
   filePath: string;
