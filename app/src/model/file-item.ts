@@ -2,15 +2,16 @@ import path from "path";
 import { FileTypes, SettingsModule } from "../store/settings";
 import ft from "file-type";
 import { ActionManagerClient, ShowEpisodeInfo } from "uepisodes-modules";
+import { EpisodeFileItem } from "uepisodes-modules/dist/modules/action-common";
 
 const provideMetadata: (params: {
   basePath: string;
   filePath: string;
 }) => Promise<ShowEpisodeInfo[]> = (window as any).provideMetadata;
 
-const actionClient = new ActionManagerClient();
 
-export class FileSystemItem {
+
+export class FileSystemItem implements EpisodeFileItem {
   filePath: string;
   basePath?: string;
   error?: string;
@@ -24,7 +25,7 @@ export class FileSystemItem {
   episodeNameAlt: string | null = null;
   candidates: ShowEpisodeInfo[] = [];
   children: FileSystemItem[] = [];
-  status = "";
+  status: "" | "ready" | "loading..." = "";
   expanded = true;
 
   constructor(params: {
@@ -71,11 +72,11 @@ export class FileSystemItem {
 
       const moveAction = SettingsModule.data.moveAction
         ? new MoveActionItem(
-            this,
-            SettingsModule.data.moveAction,
-            renameAction,
-            ...copyActions
-          )
+          this,
+          SettingsModule.data.moveAction,
+          renameAction,
+          ...copyActions
+        )
         : undefined;
 
       actions.push(moveAction);

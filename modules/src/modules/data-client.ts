@@ -100,24 +100,28 @@ export default async function getMetadata<T>(
       return;
     }
   }
-}
 
-async function getModifiedTime(path: string) {
-  try {
-    // check if exists and get the last modifed date
-    const fStats = await stat(path);
-    if (fStats) {
-      return fStats.mtime;
-    }
-    return undefined;
-  } catch (e) {
-    const err = e as { code: string; errno: number };
-    // if file/path doen"t exists, return null
-    if (err && err.code === "ENOENT" && err.errno === -2) {
+  async function getModifiedTime(path: string) {
+    logger.debug("getModifiedTime", path);
+    try {
+      // check if exists and get the last modifed date
+      const fStats = await stat(path);
+      if (fStats) {
+        logger.debug("getModifiedTime", fStats.mtime);
+        return fStats.mtime;
+      }
+      logger.debug("getModifiedTime", "empty result from stat");
       return undefined;
+    } catch (e) {
+      const err = e as { code: string; errno: number };
+      // if file/path doen"t exists, return null
+      if (err && err.code === "ENOENT" && err.errno === -2) {
+        logger.debug("getModifiedTime", "file not found");
+        return undefined;
+      }
+      // otherwise - re-throw;
+      throw err;
     }
-    // otherwise - re-throw;
-    throw err;
   }
 }
 

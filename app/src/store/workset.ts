@@ -11,8 +11,12 @@ import fss from "fs";
 import { FileSystemItem } from "../model/file-item";
 import Vue from "vue";
 import { SettingsModule } from "./settings";
+import { ActionManagerClient } from "uepisodes-modules";
+import { ActionManagerAction } from "uepisodes-modules/dist/modules/action-common";
 
 const fs = fss.promises;
+
+const actionClient = new ActionManagerClient();
 
 export interface WorksetState {
   fileItems: FileSystemItem[];
@@ -30,7 +34,7 @@ class Workset extends VuexModule implements WorksetState {
   }
 
   @Mutation removeFileItem(id: string) {
-    const targetPath = lookupFileItem(this.fileItems, id.split(path.sep));
+    const targetPath = lookupFileItemStack(this.fileItems, id);
     if (targetPath) {
       if (targetPath.length === 1) {
         this.fileItems = [];
@@ -54,12 +58,87 @@ class Workset extends VuexModule implements WorksetState {
     }
     return workItems;
   }
+
+  @Action({ commit: "addWorkItems" })
+  async scheduleActions(fileItemPath: string, autoRun: boolean) {
+
+    const fileSystemItem = lookupFileItem(this.fileItems, fileItemPath);
+    if (fileSystemItem && fileSystemItem.status === "ready") {
+      if (fileSystemItem.actions.length === 0){
+        // no actions registered yet
+        // let's create some
+
+        const renameAction = SettingsModule.data.renameAction
+        ? ({
+          id: fileItemPath+":"SettingsModule.data.renameAction
+        } as ActionManagerAction)
+        : undefined;
+
+      actions.push(renameAction);
+
+      const copyActions = SettingsModule.data.copyActions.map(
+        (ap) => new CopyActionItem(this, ap, renameAction)
+      );
+      actions.push(...copyActions);
+
+      const moveAction = SettingsModule.data.moveAction
+        ? new MoveActionItem(
+          this,
+          SettingsModule.data.moveAction,
+          renameAction,
+          ...copyActions
+        )
+        : undefined;
+
+      actions.push(moveAction);
+
+
+
+      }
+
+      actionClient.enqueueActions()
+
+
+
+
+
+
+
+
+
+    }
+
+
+    // const workItems: FileSystemItem[] = [];
+    // for (const file of files) {
+    //   await processIncomingFiles(file, undefined, workItems);
+    // }
+    return workItems;
+  }
+
 }
+
 
 function lookupFileItem(
   fileItems: FileSystemItem[],
-  itemParts: string[]
+  filePath: string
+): FileSystemItem | undefined {
+
+  const stack = lookupFileItemStack(fileItems, filePath);
+
+  if (stack && stack.length > 1) {
+    return stack[stack.length - 1];
+  }
+  return undefined;
+}
+
+function lookupFileItemStack(
+  fileItems: FileSystemItem[],
+  itemParts: string[] | string
 ): FileSystemItem[] | undefined {
+
+  itemParts = Array.isArray(itemParts) ? itemParts : itemParts.split(path.sep);
+
   const id = itemParts.shift();
   const fi = fileItems.find((i) => i.name === id);
   if (fi) {
@@ -67,7 +146,7 @@ function lookupFileItem(
       // found it!
       return [fi];
     }
-    const ret = lookupFileItem(fi.children, itemParts);
+    const ret = lookupFileItemStack(fi.children, itemParts);
     if (ret) {
       ret.unshift(fi);
       return ret;
@@ -172,7 +251,7 @@ export interface WorkItem {
 }
 
 export class FileWorkItem implements WorkItem {
-  constructor(public fileItem: FileSystemItem) {}
+  constructor(public fileItem: FileSystemItem) { }
   get id() {
     return this.fileItem.filePath;
   }
@@ -182,7 +261,7 @@ export class FileWorkItem implements WorkItem {
 }
 
 export class FolderWorkItem implements WorkItem {
-  constructor(public fileItem: FileSystemItem) {}
+  constructor(public fileItem: FileSystemItem) { }
   get id() {
     return this.fileItem.filePath;
   }

@@ -156,20 +156,20 @@ export function getDefaultSettings() {
     ],
 
     renameAction: {
-      pattern: "${show} - S${season}E${episode}. ${title}"
+      pattern: "{{show}} - S{{season}}E{{episode}}. {{title}}"
     },
     moveAction: {
-      pattern: "../${show}/S${season}E${episode}. ${title}"
+      pattern: "../{{show}} - S{{season}}E{{episode}}. {{title}}"
     },
     copyActions: [
       {
-        pattern: "../${show}/S${season}E${episode}. ${title}"
+        pattern: "../{{show}} - S{{season}}E{{episode}}. {{title}}"
       },
       {
-        pattern: "../${show}/S${season}E${episode}. ${title}"
+        pattern: "../{{show}} - S{{season}}E{{episode}}. {{title}}"
       },
       {
-        pattern: "../${show}/S${season}E${episode}. ${title}"
+        pattern: "../{{show}} - S{{season}}E{{episode}}. {{title}}"
       }
     ]
   };

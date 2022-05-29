@@ -3,6 +3,22 @@ import type { ActionType } from "./action-manager";
 
 export type ActionStatus = "waiting" | "running" | "completed" | "canceled" | "skipped" | "error";
 
+
+export interface EpisodeFileItem {
+  filePath: string;
+  showName: string | null;
+  episodeName: string | null;
+  season: number | null;
+  episode: number | null;
+  episodeAlt: number | null;
+  episodeNameAlt: string | null;
+}
+
+export interface ActionPattern {
+  pattern: string;
+}
+
+
 export interface ActionManagerAction {
   id: string;
   type: ActionType,
